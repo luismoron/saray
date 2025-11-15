@@ -35,7 +35,7 @@ class ProductCard extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: theme.colorScheme.surfaceVariant,
+                  color: theme.colorScheme.surfaceContainerHighest,
                 ),
                 child: product.imageUrls.isNotEmpty
                     ? ClipRRect(

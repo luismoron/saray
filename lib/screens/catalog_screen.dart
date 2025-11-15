@@ -29,59 +29,65 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.catalog),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(120),
-          child: _buildSearchAndFilters(context, l10n, theme),
-        ),
       ),
-      body: Consumer<ProductProvider>(
-        builder: (context, productProvider, child) {
-          if (productProvider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      body: Column(
+        children: [
+          // Área de búsqueda y filtros
+          _buildSearchAndFilters(context, l10n, theme),
 
-          if (productProvider.products.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.inventory_2_outlined,
-                    size: 64,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No hay productos disponibles',
-                    style: theme.textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Los productos aparecerán aquí cuando estén disponibles',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+          // Lista de productos
+          Expanded(
+            child: Consumer<ProductProvider>(
+              builder: (context, productProvider, child) {
+                if (productProvider.isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (productProvider.products.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 64,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No hay productos disponibles',
+                          style: theme.textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Los productos aparecerán aquí cuando estén disponibles',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
+                  );
+                }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: productProvider.products.length,
-            itemBuilder: (context, index) {
-              final product = productProvider.products[index];
-              return ProductCard(
-                product: product,
-                onTap: () => _showProductDetails(context, product),
-              );
-            },
-          );
-        },
+                return ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: productProvider.products.length,
+                  itemBuilder: (context, index) {
+                    final product = productProvider.products[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () => _showProductDetails(context, product),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -91,8 +97,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
       builder: (context, productProvider, child) {
         return Container(
           padding: const EdgeInsets.all(16),
-          color: theme.colorScheme.surface,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.outline.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+          ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Barra de búsqueda
               TextField(
@@ -113,56 +128,50 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 onChanged: (value) {
                   productProvider.searchProducts(value);
                 },
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
 
               // Filtros por categoría
-              SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    // Opción "Todos"
-                    FilterChip(
-                      label: Text(l10n.allCategories),
-                      selected: _selectedCategory.isEmpty,
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  // Opción "Todos"
+                  FilterChip(
+                    label: Text(l10n.allCategories),
+                    selected: _selectedCategory.isEmpty,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedCategory = '';
+                      });
+                      productProvider.filterByCategory('');
+                    },
+                  ),
+
+                  // Categorías disponibles
+                  ...productProvider.categories.map((category) {
+                    return FilterChip(
+                      label: Text(category),
+                      selected: _selectedCategory == category,
                       onSelected: (selected) {
                         setState(() {
-                          _selectedCategory = '';
+                          _selectedCategory = selected ? category : '';
                         });
-                        productProvider.filterByCategory('');
+                        productProvider.filterByCategory(selected ? category : '');
                       },
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    // Categorías disponibles
-                    ...productProvider.categories.map((category) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: _selectedCategory == category,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedCategory = selected ? category : '';
-                            });
-                            productProvider.filterByCategory(selected ? category : '');
-                          },
-                        ),
-                      );
-                    }),
-                  ],
-                ),
+                    );
+                  }),
+                ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // Información de resultados
               Row(
@@ -184,8 +193,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         });
                         productProvider.clearFilters();
                       },
-                      icon: const Icon(Icons.clear),
-                      label: Text(l10n.clearFilters),
+                      icon: const Icon(Icons.clear, size: 16),
+                      label: Text(l10n.clearFilters, style: const TextStyle(fontSize: 12)),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
                 ],
               ),

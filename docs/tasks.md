@@ -39,7 +39,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] **Catálogo de Productos**:
   - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Implementado con filtros y búsqueda)
   - [x] Filtros por categoría, búsqueda por nombre.
-  - [ ] Detalles de producto: imagen, descripción, precio, botón "Agregar al carrito".
+  - [x] Detalles de producto: imagen, descripción, precio, botón "Agregar al carrito". (Vista básica implementada)
 - [ ] **Carrito de Compras**:
   - [ ] Pantalla para ver productos agregados, calcular total.
   - [ ] Funcionalidad para aumentar/disminuir cantidad, eliminar items.

@@ -36,7 +36,7 @@ class ProductService {
     return _firestore
         .collection('products')
         .where('name', isGreaterThanOrEqualTo: query)
-        .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+        .where('name', isLessThanOrEqualTo: '$query\uf8ff')
         .orderBy('name')
         .snapshots()
         .map((snapshot) {
@@ -67,6 +67,7 @@ class ProductService {
       final categories = snapshot.docs
           .map((doc) => doc.data()['category'] as String?)
           .where((category) => category != null && category.isNotEmpty)
+          .cast<String>()
           .toSet()
           .toList();
       return categories;
