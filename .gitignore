@@ -43,3 +43,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Additional Flutter ignores
+flutter_*.png
+flutter_*.jpg
+flutter_*.webp
+android/app/src/main/gen/
+android/app/src/main/assets/flutter_assets/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Pods/
+web/build/
+windows/flutter/generated/
+macos/Flutter/ephemeral/
+macos/build/
+linux/build/
