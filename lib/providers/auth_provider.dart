@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import '../services/auth_service.dart';
+import '../models/user.dart';
+
+class AuthProvider with ChangeNotifier {
+  final AuthService _authService = AuthService();
+  auth.User? _firebaseUser;
+  User? _user;
+  bool _isLoading = false;
+
+  auth.User? get firebaseUser => _firebaseUser;
+  User? get user => _user;
+  bool get isLoading => _isLoading;
+  bool get isAuthenticated => _firebaseUser != null;
+
+  AuthProvider() {
+    _init();
+  }
+
+  void _init() {
+    _authService.authStateChanges.listen(_onAuthStateChanged);
+  }
+
+  void _onAuthStateChanged(auth.User? firebaseUser) async {
+    _firebaseUser = firebaseUser;
+    if (firebaseUser != null) {
+      _user = await _authService.getUserData(firebaseUser.uid);
+    } else {
+      _user = null;
+    }
+    notifyListeners();
+  }
+
+  Future<void> register(String email, String password, String name) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _authService.registerWithEmailAndPassword(email, password, name);
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> login(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _authService.signInWithEmailAndPassword(email, password);
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    await _authService.signOut();
+  }
+
+  Future<void> resetPassword(String email) async {
+    await _authService.resetPassword(email);
+  }
+}
