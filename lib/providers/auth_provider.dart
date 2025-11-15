@@ -40,11 +40,14 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> register(String email, String password, String name) async {
+    print('Register started for $email');
     _isLoading = true;
     notifyListeners();
     try {
       await _authService.registerWithEmailAndPassword(email, password, name);
+      print('Register success for $email');
     } catch (e) {
+      print('Register error: $e');
       _isLoading = false;
       notifyListeners();
       rethrow;

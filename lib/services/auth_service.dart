@@ -15,13 +15,15 @@ class AuthService {
   // Registro con email y contraseña
   Future<auth.UserCredential> registerWithEmailAndPassword(
       String email, String password, String name) async {
+    print('AuthService: Starting register for $email');
     try {
       auth.UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       auth.User? user = result.user;
+      print('AuthService: User created: ${user?.email}');
 
       if (user != null) {
-        // Crear documento en Firestore
+        print('AuthService: Saving to Firestore for ${user.uid}');
         await _firestore.collection('users').doc(user.uid).set({
           'id': user.uid,
           'name': name,
@@ -29,10 +31,12 @@ class AuthService {
           'role': 'customer',
           'createdAt': FieldValue.serverTimestamp(),
         });
+        print('AuthService: Firestore save success');
       }
 
       return result;
     } catch (e) {
+      print('AuthService: Register error: $e');
       rethrow;
     }
   }

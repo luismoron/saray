@@ -71,7 +71,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error: ${e.toString()}')),
+                            SnackBar(content: Text('Error sending reset email. Please try again.')),
                           );
                         }
                       }
@@ -97,13 +97,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         const Icon(Icons.check_circle, color: Colors.green, size: 64),
         const SizedBox(height: 20),
         const Text(
-          'Password reset email sent!',
+          'Reset email sent!',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
-        Text(
-          'Check your email (${_emailController.text}) for instructions to reset your password.',
+        const Text(
+          'If an account with this email exists, you will receive a password reset link.',
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20),

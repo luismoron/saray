@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
@@ -72,14 +73,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _emailController.text,
                                 _passwordController.text,
                                 _nameController.text);
-                            // Navigate to home on success
+                            // Navigate to home on success via AuthWrapper
                             if (context.mounted) {
-                              Navigator.of(context).pushReplacementNamed('/home');
+                              Navigator.of(context).pushReplacementNamed('/');
                             }
                           } catch (e) {
+                            String errorMessage;
+                            if (e is auth.FirebaseAuthException) {
+                              switch (e.code) {
+                                case 'email-already-in-use':
+                                  errorMessage = 'This email is already registered. Try logging in instead.';
+                                  break;
+                                case 'weak-password':
+                                  errorMessage = 'Password is too weak. Choose a stronger password.';
+                                  break;
+                                case 'invalid-email':
+                                  errorMessage = 'Invalid email address.';
+                                  break;
+                                default:
+                                  errorMessage = 'Registration failed. Please try again.';
+                              }
+                            } else {
+                              errorMessage = 'An unexpected error occurred.';
+                            }
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(e.toString())),
+                                SnackBar(content: Text(errorMessage)),
                               );
                             }
                           }
