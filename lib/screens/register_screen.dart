@@ -73,11 +73,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _passwordController.text,
                                 _nameController.text);
                             // Navigate to home on success
-                            Navigator.of(context).pushReplacementNamed('/home');
+                            if (context.mounted) {
+                              Navigator.of(context).pushReplacementNamed('/home');
+                            }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
                           }
                         }
                       },

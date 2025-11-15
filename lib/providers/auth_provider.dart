@@ -8,27 +8,34 @@ class AuthProvider with ChangeNotifier {
   auth.User? _firebaseUser;
   User? _user;
   bool _isLoading = false;
+  bool _isInitialized = false;
 
   auth.User? get firebaseUser => _firebaseUser;
   User? get user => _user;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _firebaseUser != null;
+  bool get isInitialized => _isInitialized;
 
   AuthProvider() {
+    print('AuthProvider constructor called');
     _init();
   }
 
   void _init() {
+    print('AuthProvider _init called');
     _authService.authStateChanges.listen(_onAuthStateChanged);
   }
 
   void _onAuthStateChanged(auth.User? firebaseUser) async {
+    print('AuthStateChanged called with user: ${firebaseUser?.email}');
     _firebaseUser = firebaseUser;
     if (firebaseUser != null) {
       _user = await _authService.getUserData(firebaseUser.uid);
     } else {
       _user = null;
     }
+    _isInitialized = true;
+    print('AuthProvider initialized: $_isInitialized');
     notifyListeners();
   }
 
