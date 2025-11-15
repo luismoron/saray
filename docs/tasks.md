@@ -84,6 +84,6 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [ ] Probar logout: Cerrar sesión y verificar que regrese a login.
 - [ ] Probar reset password: Enviar email de recuperación.
 - [ ] Verificar navegación: De login a register, y viceversa.
-- [ ] Probar en emulador/dispositivo Android.
+- [x] Probar en emulador/dispositivo Android.
 
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?

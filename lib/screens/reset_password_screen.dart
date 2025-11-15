@@ -65,13 +65,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     if (_formKey.currentState!.validate()) {
                       try {
                         await authProvider.resetPassword(_emailController.text);
-                        setState(() {
-                          _emailSent = true;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _emailSent = true;
+                          });
+                        }
                       } catch (e) {
-                        if (context.mounted) {
+                        if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error sending reset email. Please try again.')),
+                            const SnackBar(content: Text('Error sending reset email. Please try again.')),
                           );
                         }
                       }
@@ -81,7 +83,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             child: const Text('Back to Login'),
           ),
@@ -109,7 +113,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         const SizedBox(height: 20),
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
           },
           child: const Text('Back to Login'),
         ),

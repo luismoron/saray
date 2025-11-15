@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:provider/provider.dart';
 import 'package:saray/l10n/app_localizations.dart';
 import 'firebase_options.dart';
@@ -8,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/reset_password_screen.dart';
 import 'screens/catalog_screen.dart';
 
 void main() async {
@@ -16,9 +16,10 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-    );
+    // Temporalmente deshabilitado para pruebas
+    // await FirebaseAppCheck.instance.activate(
+    //   androidProvider: AndroidProvider.debug,
+    // );
     print('Firebase initialized successfully');
   } catch (e) {
     print('Firebase initialization failed: $e');
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
           '/': (context) => const AuthWrapper(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
+          '/reset-password': (context) => const ResetPasswordScreen(),
           '/home': (context) => const HomeScreen(),
           '/catalog': (context) => const CatalogScreen(),
         },
@@ -80,10 +82,14 @@ class AuthWrapper extends StatelessWidget {
           child: CircularProgressIndicator(),
         ),
       );
-    } else if (authProvider.isAuthenticated) {
-      return const HomeScreen();
     } else {
+      // Temporalmente forzar login para pruebas
       return const LoginScreen();
+      // } else if (authProvider.isAuthenticated) {
+      //   return const HomeScreen();
+      // } else {
+      //   return const LoginScreen();
+      // }
     }
   }
 }
