@@ -7,5 +7,5 @@ Si copio y te pego los errores (como diagnósticos de Dart/Flutter o cualquier o
 - Por qué ocurre el error.
 - La solución para repararlo.
 
-## Regla 2: Plataforma de la App - SOLO ANDROID
-**IMPORTANTE:** La app "Bazar de Saray" está diseñada EXCLUSIVAMENTE para la plataforma Android por ahora. No se debe configurar ni optimizar para iOS, Web, Windows, Linux o macOS. Toda la configuración de Firebase, especialmente el SHA-1 para autenticación, puede ser complicada en Android debido a los requisitos de seguridad de Google. Las pruebas y desarrollo se centrarán únicamente en dispositivos Android.
+## Regla 2: Plataforma de la App - SOLO ANDROID - NO HACER BUILD PARA OTRAS PLATAFORMAS
+**CRÍTICO - NO OLVIDAR NUNCA:** La app "Bazar de Saray" está diseñada EXCLUSIVAMENTE para la plataforma Android. **NO se debe hacer build, configurar ni optimizar para iOS, Web, Windows, Linux o macOS bajo ninguna circunstancia.** Toda la configuración de Firebase, especialmente el SHA-1 para autenticación, puede ser complicada en Android debido a los requisitos de seguridad de Google. Las pruebas y desarrollo se centrarán únicamente en dispositivos Android. **Recordatorio permanente: Solo Android, nada más.**

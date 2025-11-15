@@ -34,7 +34,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 ## 3. Funcionalidades Básicas de la App
 - [x] **Autenticación con Firebase Auth**:
   - [x] Pantalla de login/registro con email/contraseña.
-  - [ ] Recuperación de contraseña (pantalla implementada, pero no probada).
+  - [x] Recuperación de contraseña (pantalla implementada y probada).
   - [x] Gestión de sesiones (logout automático).
 - [x] **Catálogo de Productos**:
   - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Básica implementada)
@@ -79,11 +79,11 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [ ] **Optimización de Rendimiento**: Lazy loading en listas, caching de imágenes.
 
 ## Pruebas Pendientes
-- [ ] Probar registro de usuario: Crear cuenta, verificar en Firebase Auth y Firestore.
-- [ ] Probar login: Iniciar sesión con credenciales válidas.
-- [ ] Probar logout: Cerrar sesión y verificar que regrese a login.
-- [ ] Probar reset password: Enviar email de recuperación.
-- [ ] Verificar navegación: De login a register, y viceversa.
+- [x] Probar registro de usuario: Crear cuenta, verificar en Firebase Auth y Firestore.
+- [x] Probar login: Iniciar sesión con credenciales válidas.
+- [x] Probar logout: Cerrar sesión y verificar que regrese a login.
+- [x] Probar reset password: Enviar email de recuperación.
+- [x] Verificar navegación: De login a register, y viceversa.
 - [x] Probar en emulador/dispositivo Android.
 
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?
