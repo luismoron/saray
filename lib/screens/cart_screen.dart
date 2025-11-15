@@ -212,12 +212,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void _proceedToCheckout(BuildContext context, CartProvider cartProvider) {
-    // TODO: Implementar pantalla de checkout
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de checkout próximamente'),
-        duration: Duration(seconds: 3),
-      ),
-    );
+    // Navegar al checkout
+    Navigator.of(context).pushNamed('/checkout');
   }
 }

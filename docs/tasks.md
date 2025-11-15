@@ -19,7 +19,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] **Definir modelos de datos**:
   - [x] Usuario: ID, nombre, email, teléfono, dirección, rol (cliente/admin).
   - [ ] Producto: ID, nombre, descripción, precio, categoría (ej. "Repuestos de lavadoras"), stock, imágenes (URLs de Firebase Storage).
-  - [ ] Pedido: ID, usuario, lista de productos, total, estado (pendiente, enviado, entregado), fecha.
+  - [x] Pedido: ID, usuario, lista de productos, total, estado (pendiente, enviado, entregado), fecha.
   - [ ] Categoría: ID, nombre (ej. "Electrodomésticos", "Repuestos").
 - [x] **Estructura de carpetas en lib/**:
   - [x] models/: Clases para Usuario, Producto, Pedido, etc.
@@ -40,13 +40,13 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Implementado con filtros y búsqueda)
   - [x] Filtros por categoría, búsqueda por nombre.
   - [x] Detalles de producto: imagen, descripción, precio, botón "Agregar al carrito". (Vista básica implementada)
-- [ ] **Carrito de Compras**:
-  - [ ] Pantalla para ver productos agregados, calcular total.
-  - [ ] Funcionalidad para aumentar/disminuir cantidad, eliminar items.
-  - [ ] Integración con Firestore para guardar carritos por usuario.
-- [ ] **Proceso de Compra**:
-  - [ ] Pantalla de checkout: confirmar dirección, método de pago (integrar con Stripe o PayPal si es necesario, pero empezar simple).
-  - [ ] Crear pedido en Firestore y actualizar stock.
+- [x] **Carrito de Compras**:
+  - [x] Pantalla para ver productos agregados, calcular total.
+  - [x] Funcionalidad para aumentar/disminuir cantidad, eliminar items.
+  - [x] Integración con Firestore para guardar carritos por usuario.
+- [x] **Proceso de Compra**:
+  - [x] Pantalla de checkout: confirmar dirección, método de pago (implementado con pago contra entrega).
+  - [x] Crear pedido en Firestore y actualizar stock.
   - [ ] Notificaciones push (usar Firebase Cloud Messaging) para confirmaciones.
 - [ ] **Perfil de Usuario**:
   - [ ] Ver/editar datos personales, historial de pedidos.
@@ -77,6 +77,20 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl. Implementado con archivos ARB para inglés y español, detectando automáticamente el idioma del sistema operativo.
 - [ ] **Accesibilidad**: Asegurar que la UI sea accesible (contraste, tamaños de fuente).
 - [ ] **Optimización de Rendimiento**: Lazy loading en listas, caching de imágenes.
+- [ ] **Sistema de Notificaciones Mejorado**:
+  - [ ] Implementar notificaciones push con Firebase Cloud Messaging para ofertas y actualizaciones de pedidos.
+  - [ ] Mejorar el sistema de SnackBars/notificaciones locales:
+    - [ ] Agregar animaciones personalizadas para las notificaciones.
+    - [ ] Implementar notificaciones tipo "toast" más elegantes.
+    - [ ] Agregar sonidos opcionales para notificaciones importantes.
+    - [ ] Crear un sistema de notificaciones persistentes para mensajes críticos (errores de red, etc.).
+    - [ ] Implementar notificaciones contextuales que cambien según el estado de la app (modo offline, carrito lleno, etc.).
+    - [ ] Agregar opción de "no molestar" o silenciar notificaciones por tiempo determinado.
+  - [ ] Sistema de notificaciones in-app:
+    - [ ] Centro de notificaciones para ver historial de mensajes.
+    - [ ] Badges/notificaciones en el ícono de la app para notificaciones no leídas.
+    - [ ] Notificaciones de productos relacionados o recomendaciones.
+    - [ ] Recordatorios para completar compras abandonadas.
 
 ## Pruebas Pendientes
 - [x] Probar registro de usuario: Crear cuenta, verificar en Firebase Auth y Firestore.
@@ -85,5 +99,26 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] Probar reset password: Enviar email de recuperación.
 - [x] Verificar navegación: De login a register, y viceversa.
 - [x] Probar en emulador/dispositivo Android.
+- [ ] **Pruebas del Carrito de Compras**:
+  - [ ] Agregar productos al carrito y verificar persistencia.
+  - [ ] Modificar cantidades y verificar actualización en tiempo real.
+  - [ ] Remover productos y verificar actualización.
+  - [ ] Limpiar carrito completo.
+  - [ ] Verificar que el carrito persista entre sesiones de usuario.
+- [ ] **Pruebas del Proceso de Checkout**:
+  - [ ] Completar formulario de checkout con datos válidos.
+  - [ ] Verificar creación de pedido en Firestore.
+  - [ ] Verificar actualización automática del stock.
+  - [ ] Verificar limpieza del carrito después del pedido.
+  - [ ] Verificar navegación de vuelta al home después del pedido.
+- [ ] **Pruebas de Notificaciones**:
+  - [ ] Verificar notificaciones al agregar productos.
+  - [ ] Verificar notificaciones al modificar/remover del carrito.
+  - [ ] Verificar notificaciones de error.
+  - [ ] Verificar que las notificaciones se oculten automáticamente.
+- [ ] **Pruebas de Integración**:
+  - [ ] Flujo completo: Login → Catálogo → Carrito → Checkout → Confirmación.
+  - [ ] Verificar manejo de errores de red.
+  - [ ] Verificar comportamiento offline/online.
 
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?

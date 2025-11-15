@@ -12,6 +12,7 @@ import 'screens/home_screen.dart';
 import 'screens/reset_password_screen.dart';
 import 'screens/catalog_screen.dart';
 import 'screens/cart_screen.dart';
+import 'screens/checkout_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomeScreen(),
           '/catalog': (context) => const CatalogScreen(),
           '/cart': (context) => const CartScreen(),
+          '/checkout': (context) => const CheckoutScreen(),
         },
       ),
     );
