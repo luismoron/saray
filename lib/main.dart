@@ -27,8 +27,20 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Bazar de Saray',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.orange,
+            brightness: Brightness.light,
+          ),
+          useMaterial3: true,
         ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.orange,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+        ),
+        themeMode: ThemeMode.system, // Respeta la configuración del sistema
         initialRoute: '/',
         routes: {
           '/': (context) => const AuthWrapper(),
