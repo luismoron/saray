@@ -2,14 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    // TODO: Reemplaza estos valores con los de tu Firebase Console
     return const FirebaseOptions(
-      apiKey: "your-api-key",
-      authDomain: "your-project.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef",
+      apiKey: "your-api-key",  // Reemplaza con el valor de Firebase Console
+      authDomain: "bazar-838fa.firebaseapp.com",
+      projectId: "bazar-838fa",
+      storageBucket: "bazar-838fa.appspot.com",
+      messagingSenderId: "your-messaging-sender-id",  // Reemplaza
+      appId: "your-app-id",  // Reemplaza
     );
   }
 }
