@@ -69,6 +69,7 @@ class HomeScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Datos de ejemplo agregados exitosamente'),
+                        duration: Duration(seconds: 3),
                       ),
                     );
                   }
@@ -77,6 +78,7 @@ class HomeScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error agregando datos: $e'),
+                        duration: const Duration(seconds: 4),
                       ),
                     );
                   }

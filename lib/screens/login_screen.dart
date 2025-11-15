@@ -86,7 +86,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Invalid email or password.')),
+                                const SnackBar(
+                                  content: Text('Invalid email or password.'),
+                                  duration: Duration(seconds: 3),
+                                ),
                               );
                             }
                           }

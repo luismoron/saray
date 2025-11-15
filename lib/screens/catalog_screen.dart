@@ -215,6 +215,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Detalles de ${product.name} - Próximamente'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

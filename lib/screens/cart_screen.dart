@@ -16,12 +16,13 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar carrito cuando se carga la pantalla
+    // Solo inicializar si es realmente necesario y no hay items cargados
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-      if (authProvider.user != null) {
+      // Solo inicializar si el usuario está autenticado y el carrito no está inicializado
+      if (authProvider.user != null && cartProvider.cartItems.isEmpty && !cartProvider.isLoading) {
         cartProvider.initializeCart(authProvider.user!.id);
       }
     });
@@ -41,7 +42,7 @@ class _CartScreenState extends State<CartScreen> {
               if (cartProvider.hasItems) {
                 return IconButton(
                   icon: const Icon(Icons.clear_all),
-                  onPressed: () => _showClearCartDialog(context, cartProvider, l10n),
+                  onPressed: () => _clearCart(context, cartProvider),
                   tooltip: 'Limpiar carrito',
                 );
               }
@@ -52,16 +53,19 @@ class _CartScreenState extends State<CartScreen> {
       ),
       body: Consumer<CartProvider>(
         builder: (context, cartProvider, child) {
-          if (cartProvider.isLoading) {
+          // Si no hay items y no está cargando, mostrar vacío inmediatamente
+          if (!cartProvider.hasItems && !cartProvider.isLoading) {
+            return _buildEmptyCart(context, l10n, theme);
+          }
+
+          // Si está cargando y no hay items, mostrar loading
+          if (cartProvider.isLoading && !cartProvider.hasItems) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          if (!cartProvider.hasItems) {
-            return _buildEmptyCart(context, l10n, theme);
-          }
-
+          // Si hay items, mostrarlos inmediatamente (incluso si está cargando más datos)
           return Column(
             children: [
               // Lista de items del carrito
@@ -75,7 +79,7 @@ class _CartScreenState extends State<CartScreen> {
                       cartItem: cartItem,
                       onIncrement: () => cartProvider.incrementQuantity(cartItem.id),
                       onDecrement: () => cartProvider.decrementQuantity(cartItem.id),
-                      onRemove: () => _showRemoveItemDialog(context, cartProvider, cartItem, l10n),
+                      onRemove: () => _removeCartItem(context, cartProvider, cartItem),
                     );
                   },
                 ),
@@ -187,56 +191,22 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _showClearCartDialog(BuildContext context, CartProvider cartProvider, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Limpiar Carrito'),
-        content: const Text('¿Estás seguro de que quieres vaciar tu carrito?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              cartProvider.clearCart();
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Carrito vaciado')),
-              );
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Vaciar'),
-          ),
-        ],
+  void _clearCart(BuildContext context, CartProvider cartProvider) {
+    cartProvider.clearCart();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Carrito vaciado'),
+        duration: Duration(seconds: 2),
       ),
     );
   }
 
-  void _showRemoveItemDialog(BuildContext context, CartProvider cartProvider, cartItem, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remover Producto'),
-        content: Text('¿Quieres remover "${cartItem.product.name}" del carrito?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              cartProvider.removeFromCart(cartItem.id);
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${cartItem.product.name} removido del carrito')),
-              );
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Remover'),
-          ),
-        ],
+  void _removeCartItem(BuildContext context, CartProvider cartProvider, cartItem) {
+    cartProvider.removeFromCart(cartItem.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${cartItem.product.name} removido del carrito'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -246,6 +216,7 @@ class _CartScreenState extends State<CartScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Funcionalidad de checkout próximamente'),
+        duration: Duration(seconds: 3),
       ),
     );
   }

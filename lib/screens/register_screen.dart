@@ -117,7 +117,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             }
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(errorMessage)),
+                                SnackBar(
+                                  content: Text(errorMessage),
+                                  duration: const Duration(seconds: 4),
+                                ),
                               );
                             }
                           }

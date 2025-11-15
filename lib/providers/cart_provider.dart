@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../models/cart_item.dart';
 import '../models/product.dart';
 import '../services/cart_service.dart';
@@ -9,6 +10,7 @@ class CartProvider with ChangeNotifier {
   List<CartItem> _cartItems = [];
   bool _isLoading = false;
   String? _currentUserId;
+  StreamSubscription<List<CartItem>>? _cartSubscription;
 
   // Getters
   List<CartItem> get cartItems => _cartItems;
@@ -19,10 +21,16 @@ class CartProvider with ChangeNotifier {
 
   // Inicializar carrito para un usuario
   void initializeCart(String userId) {
-    if (_currentUserId != userId) {
-      _currentUserId = userId;
-      loadCart();
+    if (_currentUserId == userId && _cartSubscription != null) {
+      // Ya está inicializado para este usuario
+      return;
     }
+
+    // Cancelar suscripción anterior si existe
+    _cartSubscription?.cancel();
+
+    _currentUserId = userId;
+    loadCart();
   }
 
   // Cargar carrito del usuario
@@ -33,13 +41,20 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _cartService.getUserCart(_currentUserId!).listen((cartItems) {
-        _cartItems = cartItems;
-        _isLoading = false;
-        notifyListeners();
-      });
+      _cartSubscription = _cartService.getUserCart(_currentUserId!).listen(
+        (cartItems) {
+          _cartItems = cartItems;
+          _isLoading = false;
+          notifyListeners();
+        },
+        onError: (error) {
+          print('Error loading cart: $error');
+          _isLoading = false;
+          notifyListeners();
+        },
+      );
     } catch (e) {
-      print('Error loading cart: $e');
+      print('Error setting up cart stream: $e');
       _isLoading = false;
       notifyListeners();
     }
@@ -56,28 +71,116 @@ class CartProvider with ChangeNotifier {
       addedAt: DateTime.now(),
     );
 
-    final result = await _cartService.addToCart(_currentUserId!, cartItem);
-    return result != null;
+    // Actualizar localmente para feedback inmediato
+    final existingIndex = _cartItems.indexWhere((item) => item.product.id == product.id);
+    if (existingIndex != -1) {
+      // Si ya existe, incrementar cantidad localmente
+      final existingItem = _cartItems[existingIndex];
+      _cartItems[existingIndex] = existingItem.copyWith(
+        quantity: existingItem.quantity + quantity
+      );
+    } else {
+      // Si no existe, agregar nuevo item con ID temporal
+      _cartItems.insert(0, cartItem.copyWith(id: 'temp_${DateTime.now().millisecondsSinceEpoch}'));
+    }
+    notifyListeners();
+
+    // Luego sincronizar con Firestore
+    try {
+      final result = await _cartService.addToCart(_currentUserId!, cartItem);
+      if (result != null) {
+        // Actualizar el ID real si se agregó correctamente
+        if (existingIndex != -1) {
+          // Ya se actualizó la cantidad, no necesitamos hacer nada más
+        } else {
+          // Reemplazar el item temporal con el real
+          final tempIndex = _cartItems.indexWhere((item) => item.id.startsWith('temp_'));
+          if (tempIndex != -1) {
+            _cartItems[tempIndex] = _cartItems[tempIndex].copyWith(id: result);
+          }
+        }
+        notifyListeners();
+        return true;
+      } else {
+        // Revertir cambios locales si falló
+        if (existingIndex != -1) {
+          _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
+            quantity: _cartItems[existingIndex].quantity - quantity
+          );
+        } else {
+          _cartItems.removeWhere((item) => item.id.startsWith('temp_'));
+        }
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      print('Error adding to cart: $e');
+      // Revertir cambios locales si falló
+      if (existingIndex != -1) {
+        _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
+          quantity: _cartItems[existingIndex].quantity - quantity
+        );
+      } else {
+        _cartItems.removeWhere((item) => item.id.startsWith('temp_'));
+      }
+      notifyListeners();
+      return false;
+    }
   }
 
   // Actualizar cantidad de un item
   Future<bool> updateQuantity(String cartItemId, int quantity) async {
     if (_currentUserId == null) return false;
 
-    final success = await _cartService.updateCartItemQuantity(_currentUserId!, cartItemId, quantity);
-    if (success) {
-      // Actualizar localmente para feedback inmediato
-      final index = _cartItems.indexWhere((item) => item.id == cartItemId);
-      if (index != -1) {
+    // Actualizar localmente para feedback inmediato
+    final index = _cartItems.indexWhere((item) => item.id == cartItemId);
+    if (index == -1) return false;
+
+    final oldQuantity = _cartItems[index].quantity;
+    if (quantity <= 0) {
+      _cartItems.removeAt(index);
+    } else {
+      _cartItems[index] = _cartItems[index].copyWith(quantity: quantity);
+    }
+    notifyListeners();
+
+    // Sincronizar con Firestore
+    try {
+      final success = await _cartService.updateCartItemQuantity(_currentUserId!, cartItemId, quantity);
+      if (!success) {
+        // Revertir cambios locales si falló
         if (quantity <= 0) {
-          _cartItems.removeAt(index);
+          // Reinsertar el item si fue removido
+          final removedItem = _cartItems.firstWhere(
+            (item) => item.id == cartItemId,
+            orElse: () => _cartItems[index].copyWith(quantity: oldQuantity),
+          );
+          if (removedItem.id != cartItemId) {
+            _cartItems.insert(index, removedItem.copyWith(quantity: oldQuantity));
+          }
         } else {
-          _cartItems[index] = _cartItems[index].copyWith(quantity: quantity);
+          _cartItems[index] = _cartItems[index].copyWith(quantity: oldQuantity);
         }
         notifyListeners();
       }
+      return success;
+    } catch (e) {
+      print('Error updating cart item: $e');
+      // Revertir cambios locales si falló
+      if (quantity <= 0) {
+        final removedItem = _cartItems.firstWhere(
+          (item) => item.id == cartItemId,
+          orElse: () => _cartItems[index].copyWith(quantity: oldQuantity),
+        );
+        if (removedItem.id != cartItemId) {
+          _cartItems.insert(index, removedItem.copyWith(quantity: oldQuantity));
+        }
+      } else {
+        _cartItems[index] = _cartItems[index].copyWith(quantity: oldQuantity);
+      }
+      notifyListeners();
+      return false;
     }
-    return success;
   }
 
   // Incrementar cantidad
@@ -96,24 +199,57 @@ class CartProvider with ChangeNotifier {
   Future<bool> removeFromCart(String cartItemId) async {
     if (_currentUserId == null) return false;
 
-    final success = await _cartService.removeFromCart(_currentUserId!, cartItemId);
-    if (success) {
-      _cartItems.removeWhere((item) => item.id == cartItemId);
+    // Actualizar localmente para feedback inmediato
+    final index = _cartItems.indexWhere((item) => item.id == cartItemId);
+    if (index == -1) return false;
+
+    final removedItem = _cartItems[index];
+    _cartItems.removeAt(index);
+    notifyListeners();
+
+    // Sincronizar con Firestore
+    try {
+      final success = await _cartService.removeFromCart(_currentUserId!, cartItemId);
+      if (!success) {
+        // Revertir cambios locales si falló
+        _cartItems.insert(index, removedItem);
+        notifyListeners();
+      }
+      return success;
+    } catch (e) {
+      print('Error removing from cart: $e');
+      // Revertir cambios locales si falló
+      _cartItems.insert(index, removedItem);
       notifyListeners();
+      return false;
     }
-    return success;
   }
 
   // Limpiar carrito
   Future<bool> clearCart() async {
     if (_currentUserId == null) return false;
 
-    final success = await _cartService.clearCart(_currentUserId!);
-    if (success) {
-      _cartItems.clear();
+    // Actualizar localmente para feedback inmediato
+    final clearedItems = List<CartItem>.from(_cartItems);
+    _cartItems.clear();
+    notifyListeners();
+
+    // Sincronizar con Firestore
+    try {
+      final success = await _cartService.clearCart(_currentUserId!);
+      if (!success) {
+        // Revertir cambios locales si falló
+        _cartItems.addAll(clearedItems);
+        notifyListeners();
+      }
+      return success;
+    } catch (e) {
+      print('Error clearing cart: $e');
+      // Revertir cambios locales si falló
+      _cartItems.addAll(clearedItems);
       notifyListeners();
+      return false;
     }
-    return success;
   }
 
   // Verificar si un producto está en el carrito
@@ -132,6 +268,8 @@ class CartProvider with ChangeNotifier {
 
   // Limpiar estado cuando el usuario cambia
   void clearState() {
+    _cartSubscription?.cancel();
+    _cartSubscription = null;
     _cartItems.clear();
     _currentUserId = null;
     notifyListeners();

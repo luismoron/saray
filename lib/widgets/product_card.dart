@@ -183,7 +183,7 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  void _addToCart(BuildContext context) {
+  void _addToCart(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
@@ -191,22 +191,68 @@ class ProductCard extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Debes iniciar sesión para agregar productos al carrito'),
+          duration: Duration(seconds: 3),
         ),
       );
       return;
     }
 
-    cartProvider.addToCart(product, quantity: 1);
+    // Mostrar indicador de carga
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product.name} agregado al carrito'),
-        action: SnackBarAction(
-          label: 'Ver Carrito',
-          onPressed: () {
-            Navigator.of(context).pushNamed('/cart');
-          },
+      const SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 16),
+            Text('Agregando al carrito...'),
+          ],
         ),
+        duration: Duration(seconds: 1),
       ),
     );
+
+    try {
+      final success = await cartProvider.addToCart(product, quantity: 1);
+
+      if (success) {
+        // Mostrar notificación con acción condicional
+        final cartProvider = Provider.of<CartProvider>(context, listen: false);
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('${product.name} agregado al carrito'),
+            duration: const Duration(seconds: 3),
+            action: cartProvider.hasItems ? SnackBarAction(
+              label: 'Ver Carrito',
+              onPressed: () {
+                scaffoldMessenger.hideCurrentSnackBar();
+                Navigator.of(context).pushNamed('/cart');
+              },
+            ) : null,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al agregar el producto al carrito. Inténtalo de nuevo.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error adding to cart: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al agregar el producto al carrito. Inténtalo de nuevo.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

@@ -81,6 +81,7 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final cartProvider = Provider.of<CartProvider>(context);
 
     if (!authProvider.isInitialized) {
       return const Scaffold(
@@ -88,14 +89,14 @@ class AuthWrapper extends StatelessWidget {
           child: CircularProgressIndicator(),
         ),
       );
+    } else if (authProvider.isAuthenticated && authProvider.user != null) {
+      // Inicializar carrito cuando el usuario esté autenticado
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cartProvider.initializeCart(authProvider.user!.id);
+      });
+      return const HomeScreen();
     } else {
-      // Temporalmente forzar login para pruebas
       return const LoginScreen();
-      // } else if (authProvider.isAuthenticated) {
-      //   return const HomeScreen();
-      // } else {
-      //   return const LoginScreen();
-      // }
     }
   }
 }
