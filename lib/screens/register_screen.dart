@@ -17,6 +17,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.isAuthenticated && context.mounted) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
@@ -73,10 +94,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _emailController.text,
                                 _passwordController.text,
                                 _nameController.text);
-                            // Navigate to home on success via AuthWrapper
-                            if (context.mounted) {
-                              Navigator.of(context).pushReplacementNamed('/');
-                            }
                           } catch (e) {
                             String errorMessage;
                             if (e is auth.FirebaseAuthException) {

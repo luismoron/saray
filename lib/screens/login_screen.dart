@@ -15,6 +15,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.isAuthenticated && context.mounted) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
@@ -59,10 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           try {
                             await authProvider.login(
                                 _emailController.text, _passwordController.text);
-                            // Navigate to home on success
-                            if (context.mounted) {
-                              Navigator.of(context).pushReplacementNamed('/home');
-                            }
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(

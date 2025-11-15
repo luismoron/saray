@@ -36,8 +36,8 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Pantalla de login/registro con email/contraseña.
   - [ ] Recuperación de contraseña (pantalla implementada, pero no probada).
   - [x] Gestión de sesiones (logout automático).
-- [ ] **Catálogo de Productos**:
-  - [ ] Pantalla principal con lista de productos (usar ListView o GridView).
+- [x] **Catálogo de Productos**:
+  - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Básica implementada)
   - [ ] Filtros por categoría, búsqueda por nombre.
   - [ ] Detalles de producto: imagen, descripción, precio, botón "Agregar al carrito".
 - [ ] **Carrito de Compras**:
