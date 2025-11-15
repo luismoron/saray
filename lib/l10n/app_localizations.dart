@@ -184,6 +184,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Product Catalog'**
   String get catalog;
+
+  /// No description provided for @searchProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search products...'**
+  String get searchProducts;
+
+  /// No description provided for @allCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allCategories;
+
+  /// No description provided for @productsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'products found'**
+  String get productsFound;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get clearFilters;
+
+  /// No description provided for @stock.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get stock;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

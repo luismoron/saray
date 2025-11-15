@@ -52,4 +52,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get catalog => 'Catálogo de Productos';
+
+  @override
+  String get searchProducts => 'Buscar productos...';
+
+  @override
+  String get allCategories => 'Todas';
+
+  @override
+  String get productsFound => 'productos encontrados';
+
+  @override
+  String get clearFilters => 'Limpiar filtros';
+
+  @override
+  String get stock => 'Stock';
 }

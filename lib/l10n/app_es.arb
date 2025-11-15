@@ -13,5 +13,10 @@
   "dontHaveAccount": "¿No tienes cuenta? Regístrate",
   "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia Sesión",
   "forgotPassword": "¿Olvidaste tu contraseña?",
-  "catalog": "Catálogo de Productos"
+  "catalog": "Catálogo de Productos",
+  "searchProducts": "Buscar productos...",
+  "allCategories": "Todas",
+  "productsFound": "productos encontrados",
+  "clearFilters": "Limpiar filtros",
+  "stock": "Stock"
 }

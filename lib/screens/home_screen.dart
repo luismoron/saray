@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../l10n/app_localizations.dart';
+import '../services/sample_data_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,9 +38,34 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pushNamed('/catalog');
-                // TODO: Navigate to product catalog
               },
               child: Text(l10n.viewProducts),
+            ),
+            const SizedBox(height: 20),
+            // Botón temporal para agregar datos de ejemplo
+            ElevatedButton(
+              onPressed: () async {
+                final sampleDataService = SampleDataService();
+                try {
+                  await sampleDataService.addSampleProducts();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Datos de ejemplo agregados exitosamente'),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error agregando datos: $e'),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Agregar Productos de Ejemplo'),
             ),
           ],
         ),

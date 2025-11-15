@@ -27,9 +27,9 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] widgets/: Componentes reutilizables (botones, tarjetas de productos).
   - [x] services/: Lógica para Firebase (auth_service.dart, firestore_service.dart).
   - [x] providers/: Gestión de estado con Provider (ej. CartProvider para el carrito).
-- [ ] **Base de datos en Firestore**:
-  - [ ] Crear colecciones: users, products, orders, categories.
-  - [ ] Configurar reglas de seguridad (Firestore Rules) para que solo usuarios autenticados puedan leer/escribir datos relevantes.
+- [x] **Base de datos en Firestore**:
+  - [x] Crear colecciones: users, products, orders, categories.
+  - [x] Configurar reglas de seguridad (Firestore Rules) para que solo usuarios autenticados puedan leer/escribir datos relevantes.
 
 ## 3. Funcionalidades Básicas de la App
 - [x] **Autenticación con Firebase Auth**:
@@ -37,8 +37,8 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Recuperación de contraseña (pantalla implementada y probada).
   - [x] Gestión de sesiones (logout automático).
 - [x] **Catálogo de Productos**:
-  - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Básica implementada)
-  - [ ] Filtros por categoría, búsqueda por nombre.
+  - [x] Pantalla principal con lista de productos (usar ListView o GridView). (Implementado con filtros y búsqueda)
+  - [x] Filtros por categoría, búsqueda por nombre.
   - [ ] Detalles de producto: imagen, descripción, precio, botón "Agregar al carrito".
 - [ ] **Carrito de Compras**:
   - [ ] Pantalla para ver productos agregados, calcular total.

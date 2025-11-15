@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:saray/l10n/app_localizations.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'providers/product_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
         title: 'Bazar de Saray',

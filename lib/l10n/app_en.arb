@@ -13,5 +13,10 @@
   "dontHaveAccount": "Don't have an account? Register",
   "alreadyHaveAccount": "Already have an account? Login",
   "forgotPassword": "Forgot Password?",
-  "catalog": "Product Catalog"
+  "catalog": "Product Catalog",
+  "searchProducts": "Search products...",
+  "allCategories": "All",
+  "productsFound": "products found",
+  "clearFilters": "Clear filters",
+  "stock": "Stock"
 }
