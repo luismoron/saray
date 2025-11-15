@@ -71,12 +71,12 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [ ] **Opcionales Avanzados**: Integrar Google Maps para direcciones de entrega, o Stripe para pagos reales.
 - [ ] **Pruebas**: Crear tests unitarios (test/) para modelos y servicios. Usar Firebase Emulator Suite para pruebas locales.
 
-## 6. Próximos Pasos y Consideraciones
-- [x] **Priorización**: Empezar con autenticación y catálogo básico, luego agregar carrito y checkout.
-- [ ] **Seguridad**: Validar inputs, usar HTTPS, y revisar reglas de Firestore para evitar accesos no autorizados.
-- [ ] **Monetización**: Pensar en comisiones por venta o suscripciones premium.
-- [ ] **Legal**: Incluir términos de servicio, política de privacidad (especialmente con datos de usuarios).
-- [ ] **Iteración**: Una vez implementado lo básico, probar con usuarios reales y ajustar basado en feedback.
+## 7. Mejoras y Tareas Adicionales
+- [x] **Soporte para Modo Claro y Oscuro**: Implementar temas que respeten la configuración del sistema, con paleta de colores cálida (naranja como seed color) para reflejar el "Bazar de Saray".
+- [ ] **Personalización de Tema**: Agregar opción para que el usuario cambie manualmente entre claro/oscuro.
+- [ ] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl.
+- [ ] **Accesibilidad**: Asegurar que la UI sea accesible (contraste, tamaños de fuente).
+- [ ] **Optimización de Rendimiento**: Lazy loading en listas, caching de imágenes.
 
 ## Pruebas Pendientes
 - [ ] Probar registro de usuario: Crear cuenta, verificar en Firebase Auth y Firestore.
