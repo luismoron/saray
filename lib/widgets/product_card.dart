@@ -29,73 +29,74 @@ class ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Imagen del producto
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: theme.colorScheme.surfaceContainerHighest,
-                ),
-                child: product.imageUrls.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: product.imageUrls.first,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) => Icon(
-                            Icons.image_not_supported,
+              // Primera fila: imagen y nombre
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Imagen del producto
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    child: product.imageUrls.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              imageUrl: product.imageUrls.first,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.image_not_supported,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.inventory_2,
+                            size: 40,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.inventory_2,
-                        size: 40,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-              ),
+                  ),
 
-              const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-              // Información del producto
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Nombre
-                    Text(
-                      product.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    // Descripción
-                    Text(
-                      product.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Categoría y precio
-                    Row(
+                  // Información básica
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Nombre
+                        Text(
+                          product.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        // Descripción
+                        Text(
+                          product.description,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        const SizedBox(height: 8),
+
                         // Categoría
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -114,52 +115,71 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                        const Spacer(),
-
-                        // Precio
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                       ],
                     ),
+                  ),
+                ],
+              ),
 
-                    const SizedBox(height: 4),
+              const SizedBox(height: 12),
 
-                    // Stock
-                    Text(
-                      '${l10n.stock}: ${product.stock}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: product.stock > 0
-                            ? theme.colorScheme.onSurfaceVariant
-                            : theme.colorScheme.error,
+              // Segunda fila: precio, stock y botón
+              Row(
+                children: [
+                  // Precio prominente
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
+                  ),
 
-                    const SizedBox(height: 8),
-
-                    // Botón de agregar al carrito
-                    if (product.stock > 0)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _addToCart(context),
-                          icon: const Icon(Icons.add_shopping_cart, size: 16),
-                          label: const Text('Agregar al Carrito'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                  // Stock y botón en columna compacta
+                  Expanded(
+                    flex: 3,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Stock
+                        Flexible(
+                          child: Text(
+                            '${l10n.stock}: ${product.stock}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: product.stock > 0
+                                  ? theme.colorScheme.onSurfaceVariant
+                                  : theme.colorScheme.error,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                  ],
-                ),
+
+                        const SizedBox(width: 8),
+
+                        // Botón de agregar al carrito
+                        if (product.stock > 0)
+                          ElevatedButton(
+                            onPressed: () => _addToCart(context),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                              minimumSize: const Size(80, 32),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            child: const Text(
+                              'Agregar',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

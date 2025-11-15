@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
-import '../l10n/app_localizations.dart';
 
 class CartItemCard extends StatelessWidget {
   final CartItem cartItem;
@@ -20,154 +19,165 @@ class CartItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Imagen del producto
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: theme.colorScheme.surfaceVariant,
-              ),
-              child: cartItem.product.imageUrls.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        cartItem.product.imageUrls.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.inventory_2,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    )
-                  : Icon(
-                      Icons.inventory_2,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-            ),
-
-            const SizedBox(width: 12),
-
-            // Información del producto
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Nombre
-                  Text(
-                    cartItem.product.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  // Precio unitario
-                  Text(
-                    '\$${cartItem.product.price.toStringAsFixed(2)} c/u',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Controles de cantidad y subtotal
-                  Row(
-                    children: [
-                      // Botones de cantidad
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: theme.colorScheme.outline,
-                            width: 1,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width - 32, // Margen de 16px a cada lado
+      ),
+      child: Card(
+        elevation: 2,
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Imagen del producto
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: theme.colorScheme.surfaceContainerHighest,
+                ),
+                child: cartItem.product.imageUrls.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          cartItem.product.imageUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.inventory_2,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
-                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Row(
+                      )
+                    : Icon(
+                        Icons.inventory_2,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Información del producto
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nombre
+                    Text(
+                      cartItem.product.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Montos: precio unitario y subtotal prominente
+                    Row(
+                      children: [
+                        // Precio unitario
+                        Text(
+                          '\$${cartItem.product.price.toStringAsFixed(2)} c/u',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Subtotal prominente
+                        Text(
+                          '\$${cartItem.subtotal.toStringAsFixed(2)}',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Controles: cantidad pequeña y remover
+                    Row(
+                      children: [
+                        // Controles de cantidad compactos
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.remove, size: 16),
+                              icon: const Icon(Icons.remove, size: 14),
                               onPressed: cartItem.quantity > 1 ? onDecrement : null,
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.all(2),
                               constraints: const BoxConstraints(
-                                minWidth: 32,
-                                minHeight: 32,
+                                minWidth: 28,
+                                minHeight: 28,
                               ),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 30,
                               child: Text(
                                 cartItem.quantity.toString(),
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.add, size: 16),
+                              icon: const Icon(Icons.add, size: 14),
                               onPressed: cartItem.quantity < cartItem.product.stock ? onIncrement : null,
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.all(2),
                               constraints: const BoxConstraints(
-                                minWidth: 32,
-                                minHeight: 32,
+                                minWidth: 28,
+                                minHeight: 28,
                               ),
                             ),
                           ],
                         ),
-                      ),
 
-                      const Spacer(),
+                        const Spacer(),
 
-                      // Subtotal
-                      Text(
-                        '\$${cartItem.subtotal.toStringAsFixed(2)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+                        // Botón de remover
+                        IconButton(
+                          onPressed: onRemove,
+                          icon: Icon(
+                            Icons.delete_outline,
+                            color: theme.colorScheme.error,
+                            size: 18,
+                          ),
+                          tooltip: 'Remover del carrito',
+                          padding: const EdgeInsets.all(6),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
                         ),
-                      ),
-
-                      // Botón de remover
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          color: theme.colorScheme.error,
-                        ),
-                        onPressed: onRemove,
-                        tooltip: 'Remover del carrito',
-                      ),
-                    ],
-                  ),
-
-                  // Indicador de stock si es bajo
-                  if (cartItem.quantity >= cartItem.product.stock)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Stock limitado',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.error,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      ],
                     ),
-                ],
+
+                    // Indicador de stock si es bajo
+                    cartItem.quantity >= cartItem.product.stock
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              'Stock limitado',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.error,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
