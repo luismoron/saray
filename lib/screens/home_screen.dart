@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,10 +9,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bazar de Saray'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -28,7 +30,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome, ${authProvider.user?.name ?? 'User'}!'),
+            Text('${l10n.welcome}, ${authProvider.user?.name ?? 'User'}!'),
             const SizedBox(height: 20),
             const Text('This is the home screen of Bazar de Saray.'),
             const SizedBox(height: 20),
@@ -37,7 +39,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).pushNamed('/catalog');
                 // TODO: Navigate to product catalog
               },
-              child: const Text('View Products'),
+              child: Text(l10n.viewProducts),
             ),
           ],
         ),

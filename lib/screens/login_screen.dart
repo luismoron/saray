@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,10 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(l10n.login),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -52,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: l10n.email),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(labelText: l10n.password),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -89,19 +91,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         }
                       },
-                      child: const Text('Login'),
+                      child: Text(l10n.loginButton),
                     ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/register');
                 },
-                child: const Text('Don\'t have an account? Register'),
+                child: Text(l10n.dontHaveAccount),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/reset-password');
                 },
-                child: const Text('Forgot Password?'),
+                child: Text(l10n.forgotPassword),
               ),
             ],
           ),

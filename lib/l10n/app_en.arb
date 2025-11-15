@@ -1,0 +1,17 @@
+{
+  "appTitle": "Bazar de Saray",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "name": "Name",
+  "loginButton": "Login",
+  "registerButton": "Register",
+  "welcome": "Welcome",
+  "viewProducts": "View Products",
+  "logout": "Logout",
+  "dontHaveAccount": "Don't have an account? Register",
+  "alreadyHaveAccount": "Already have an account? Login",
+  "forgotPassword": "Forgot Password?",
+  "catalog": "Product Catalog"
+}

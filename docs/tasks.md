@@ -74,7 +74,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 ## 7. Mejoras y Tareas Adicionales
 - [x] **Soporte para Modo Claro y Oscuro**: Implementar temas que respeten la configuración del sistema, con paleta de colores cálida (naranja como seed color) para reflejar el "Bazar de Saray".
 - [ ] **Personalización de Tema**: Agregar opción para que el usuario cambie manualmente entre claro/oscuro.
-- [ ] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl.
+- [x] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl. Implementado con archivos ARB para inglés y español, detectando automáticamente el idioma del sistema operativo.
 - [ ] **Accesibilidad**: Asegurar que la UI sea accesible (contraste, tamaños de fuente).
 - [ ] **Optimización de Rendimiento**: Lazy loading en listas, caching de imágenes.
 
