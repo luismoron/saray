@@ -67,4 +67,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stock => 'Stock';
+
+  @override
+  String get cart => 'Cart';
 }

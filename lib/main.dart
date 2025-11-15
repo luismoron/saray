@@ -5,11 +5,13 @@ import 'package:saray/l10n/app_localizations.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/product_provider.dart';
+import 'providers/cart_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/reset_password_screen.dart';
 import 'screens/catalog_screen.dart';
+import 'screens/cart_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +39,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'Bazar de Saray',
@@ -65,6 +68,7 @@ class MyApp extends StatelessWidget {
           '/reset-password': (context) => const ResetPasswordScreen(),
           '/home': (context) => const HomeScreen(),
           '/catalog': (context) => const CatalogScreen(),
+          '/cart': (context) => const CartScreen(),
         },
       ),
     );

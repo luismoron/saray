@@ -67,4 +67,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get stock => 'Stock';
+
+  @override
+  String get cart => 'Carrito';
 }

@@ -214,6 +214,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stock'**
   String get stock;
+
+  /// No description provided for @cart.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart'**
+  String get cart;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

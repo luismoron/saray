@@ -14,24 +14,25 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  late AuthProvider _authProvider;
 
   @override
   void initState() {
     super.initState();
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    authProvider.addListener(_onAuthChanged);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _authProvider.addListener(_onAuthChanged);
   }
 
   @override
   void dispose() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    authProvider.removeListener(_onAuthChanged);
+    _authProvider.removeListener(_onAuthChanged);
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   void _onAuthChanged() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (authProvider.isAuthenticated && context.mounted) {
+    if (_authProvider.isAuthenticated && context.mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
     }
   }

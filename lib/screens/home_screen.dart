@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../services/sample_data_service.dart';
 
@@ -40,6 +41,22 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).pushNamed('/catalog');
               },
               child: Text(l10n.viewProducts),
+            ),
+            const SizedBox(height: 20),
+            Consumer<CartProvider>(
+              builder: (context, cartProvider, child) {
+                return ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/cart');
+                  },
+                  icon: Badge.count(
+                    count: cartProvider.itemCount,
+                    isLabelVisible: cartProvider.itemCount > 0,
+                    child: const Icon(Icons.shopping_cart),
+                  ),
+                  label: const Text('Ver Carrito'),
+                );
+              },
             ),
             const SizedBox(height: 20),
             // Botón temporal para agregar datos de ejemplo

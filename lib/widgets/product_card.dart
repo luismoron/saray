@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/cart_provider.dart';
+import '../providers/auth_provider.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -136,11 +139,57 @@ class ProductCard extends StatelessWidget {
                             : theme.colorScheme.error,
                       ),
                     ),
+
+                    const SizedBox(height: 8),
+
+                    // Botón de agregar al carrito
+                    if (product.stock > 0)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _addToCart(context),
+                          icon: const Icon(Icons.add_shopping_cart, size: 16),
+                          label: const Text('Agregar al Carrito'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _addToCart(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    if (authProvider.user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debes iniciar sesión para agregar productos al carrito'),
+        ),
+      );
+      return;
+    }
+
+    cartProvider.addToCart(product, quantity: 1);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} agregado al carrito'),
+        action: SnackBarAction(
+          label: 'Ver Carrito',
+          onPressed: () {
+            Navigator.of(context).pushNamed('/cart');
+          },
         ),
       ),
     );
