@@ -10,17 +10,17 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Inicializar Firebase en main.dart.
 - [x] **Actualizar pubspec.yaml**:
   - [x] Agregar dependencias adicionales: provider (para gestión de estado), http (si necesitas APIs externas), cached_network_image (para imágenes), intl (para formatos de fecha/moneda).
-  - [ ] Configurar permisos en AndroidManifest.xml e Info.plist para acceso a internet y notificaciones.
-- [ ] **Configurar el entorno de desarrollo**:
-  - [ ] Asegurarse de que Flutter esté actualizado (flutter doctor).
-  - [ ] Configurar emuladores o dispositivos físicos para pruebas.
+  - [x] Configurar permisos en AndroidManifest.xml e Info.plist para acceso a internet y notificaciones.
+- [x] **Configurar el entorno de desarrollo**:
+  - [x] Asegurarse de que Flutter esté actualizado (flutter doctor).
+  - [x] Configurar emuladores o dispositivos físicos para pruebas.
 
 ## 2. Diseño de la Arquitectura y Modelos de Datos
 - [x] **Definir modelos de datos**:
   - [x] Usuario: ID, nombre, email, teléfono, dirección, rol (cliente/admin).
-  - [ ] Producto: ID, nombre, descripción, precio, categoría (ej. "Repuestos de lavadoras"), stock, imágenes (URLs de Firebase Storage).
+  - [x] Producto: ID, nombre, descripción, precio, categoría (ej. "Repuestos de lavadoras"), stock, imágenes (URLs de Firebase Storage).
   - [x] Pedido: ID, usuario, lista de productos, total, estado (pendiente, enviado, entregado), fecha.
-  - [ ] Categoría: ID, nombre (ej. "Electrodomésticos", "Repuestos").
+  - [x] Categoría: ID, nombre (ej. "Electrodomésticos", "Repuestos").
 - [x] **Estructura de carpetas en lib/**:
   - [x] models/: Clases para Usuario, Producto, Pedido, etc.
   - [x] screens/: Pantallas principales (login, home, catálogo, carrito, perfil).
@@ -65,7 +65,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [ ] Imágenes optimizadas con Firebase Storage.
 
 ## 5. Integraciones y Herramientas Adicionales
-- [ ] **Firebase Storage**: Para subir y servir imágenes de productos.
+- [x] **Firebase Storage**: Para subir y servir imágenes de productos.
 - [ ] **Firebase Cloud Messaging**: Notificaciones para ofertas o actualizaciones de pedidos.
 - [ ] **Analytics**: Firebase Analytics para rastrear uso de la app (compras, búsquedas).
 - [ ] **Opcionales Avanzados**: Integrar Google Maps para direcciones de entrega, o Stripe para pagos reales.
