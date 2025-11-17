@@ -33,10 +33,10 @@ class AppTheme {
     ),
     
     // Personalización de Tarjetas
-    cardTheme: const CardTheme(
-      color: _softBlue,
-      elevation: 2,
-    ),
+    // cardTheme: const CardTheme(
+    //   color: _softBlue,
+    //   elevation: 2,
+    // ),
   );
 
   // --- MODO OSCURO (Dark Mode) ---
