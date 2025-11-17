@@ -37,23 +37,51 @@ class Order {
 
   // Constructor desde Firestore
   factory Order.fromFirestore(Map<String, dynamic> data, String id) {
-    return Order(
-      id: id,
-      userId: data['userId'] ?? '',
-      items: (data['items'] as List<dynamic>?)
-          ?.map((item) => CartItem.fromFirestore(item as Map<String, dynamic>, ''))
-          .toList() ?? [],
-      total: (data['total'] ?? 0.0).toDouble(),
-      status: OrderStatus.values.firstWhere(
-        (status) => status.toString().split('.').last == data['status'],
+    try {
+      print('DEBUG Order.fromFirestore: Processing order $id');
+      print('DEBUG Order.fromFirestore: Data keys: ${data.keys.toList()}');
+
+      final items = (data['items'] as List<dynamic>?)
+          ?.map((item) {
+            try {
+              return CartItem.fromFirestore(item as Map<String, dynamic>, '');
+            } catch (e) {
+              print('ERROR Order.fromFirestore: Failed to parse cart item: $e');
+              return null;
+            }
+          })
+          .where((item) => item != null)
+          .cast<CartItem>()
+          .toList() ?? [];
+
+      final statusString = data['status'] as String?;
+      print('DEBUG Order.fromFirestore: Status string: $statusString');
+
+      final status = OrderStatus.values.firstWhere(
+        (status) => status.toString().split('.').last == statusString,
         orElse: () => OrderStatus.pending,
-      ),
-      deliveryAddress: data['deliveryAddress'] ?? '',
-      phoneNumber: data['phoneNumber'] ?? '',
-      notes: data['notes'],
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-    );
+      );
+
+      final createdAt = (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+      final updatedAt = (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+
+      return Order(
+        id: id,
+        userId: data['userId'] ?? '',
+        items: items,
+        total: _parseDouble(data['total']),
+        status: status,
+        deliveryAddress: data['deliveryAddress'] ?? '',
+        phoneNumber: data['phoneNumber'] ?? '',
+        notes: data['notes'],
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+    } catch (e, stackTrace) {
+      print('ERROR Order.fromFirestore: Failed to create order $id: $e');
+      print('ERROR Order.fromFirestore: Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   // Convertir a Map para Firestore
@@ -96,5 +124,22 @@ class Order {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
+  }
+
+  // Función auxiliar para parsear double de manera segura
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      try {
+        return double.parse(value);
+      } catch (e) {
+        print('ERROR: Failed to parse double from string: $value');
+        return 0.0;
+      }
+    }
+    print('ERROR: Unexpected type for total: ${value.runtimeType}');
+    return 0.0;
   }
 }

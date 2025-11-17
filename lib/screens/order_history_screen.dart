@@ -130,8 +130,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 }
 
                 final orders = snapshot.data?.docs.map((doc) {
-                  return my_order.Order.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
-                }).toList() ?? [];
+                  try {
+                    final orderData = doc.data() as Map<String, dynamic>;
+                    print('DEBUG: Processing order ${doc.id}');
+                    print('DEBUG: Order data keys: ${orderData.keys.toList()}');
+                    final order = my_order.Order.fromFirestore(orderData, doc.id);
+                    print('DEBUG: Order created successfully: ${order.id}');
+                    return order;
+                  } catch (e, stackTrace) {
+                    print('ERROR: Failed to parse order ${doc.id}: $e');
+                    print('ERROR: Stack trace: $stackTrace');
+                    // Return null for failed orders, we'll filter them out
+                    return null;
+                  }
+                }).where((order) => order != null).cast<my_order.Order>().toList() ?? [];
 
                 // Filtrar por búsqueda si hay texto
                 final filteredOrders = _searchController.text.isNotEmpty

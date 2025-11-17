@@ -40,12 +40,14 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
 ### Instalación
 
 1. Clona el repositorio:
+
    ```bash
    git clone https://github.com/luismoron/saray.git
    cd saray
    ```
 
 2. Instala dependencias:
+
    ```bash
    flutter pub get
    ```
@@ -56,6 +58,7 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
    - Coloca el archivo en `android/app/`.
 
 4. Ejecuta la app:
+
    ```bash
    flutter run
    ```
@@ -74,6 +77,7 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
 ## 📊 Estado del Proyecto (17 de noviembre de 2025)
 
 ### ✅ Completado
+
 - Autenticación completa con Firebase Auth
 - Catálogo de productos con filtros y búsqueda
 - Carrito de compras persistente
@@ -83,10 +87,12 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
 - Internacionalización (ES/EN)
 
 ### 🔄 En Progreso
+
 - Pruebas exhaustivas del carrito y checkout
 - Notificaciones push con FCM
 
 ### 📋 Próximos Pasos
+
 - Optimización de rendimiento
 - Sistema de reseñas y calificaciones
 - Búsqueda avanzada y filtros adicionales

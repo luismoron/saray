@@ -39,6 +39,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             Tab(text: 'Productos'),
             Tab(text: 'Solicitudes'),
           ],
+          labelColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
+          unselectedLabelColor: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withOpacity(0.7),
+          indicatorColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
         ),
       ),
       body: TabBarView(

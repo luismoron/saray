@@ -3,6 +3,7 @@
 Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y diseñar la app "Bazar de Saray", una aplicación de ventas para repuestos de electrodomésticos y otros productos. Esta lista se basa en las mejores prácticas para una app de e-commerce en Flutter, integrada con Firebase para autenticación, base de datos y otras herramientas. He dividido la lista en fases lógicas para que sea fácil de seguir, priorizando la configuración inicial y el diseño modular.
 
 ## 1. Configuración del Proyecto y Dependencias
+
 - [x] **Configurar Firebase en el proyecto Flutter**:
   - [x] Crear un proyecto en Firebase Console (firebase.google.com).
   - [x] Agregar la app Flutter (Android, iOS, Web) al proyecto Firebase y descargar los archivos de configuración (google-services.json para Android, GoogleService-Info.plist para iOS).
@@ -16,6 +17,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Configurar emuladores o dispositivos físicos para pruebas.
 
 ## 2. Diseño de la Arquitectura y Modelos de Datos
+
 - [x] **Definir modelos de datos**:
   - [x] Usuario: ID, nombre, email, teléfono, dirección, rol (cliente/admin).
   - [x] Producto: ID, nombre, descripción, precio, categoría (ej. "Repuestos de lavadoras"), stock, imágenes (URLs de Firebase Storage).
@@ -32,6 +34,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Configurar reglas de seguridad (Firestore Rules) para que solo usuarios autenticados puedan leer/escribir datos relevantes.
 
 ## 3. Funcionalidades Básicas de la App
+
 - [x] **Autenticación con Firebase Auth**:
   - [x] Pantalla de login/registro con email/contraseña.
   - [x] Recuperación de contraseña (pantalla implementada y probada).
@@ -67,6 +70,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Integración con Firebase Storage para subir imágenes de productos.
 
 ## 4. Diseño de UI/UX
+
 - [x] **Tema y Estilos**:
   - [x] Usar Material Design para consistencia.
   - [x] Colores: Elegir paleta relacionada con "Bazar de Saray" (tonos naranjas).
@@ -79,6 +83,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [ ] Imágenes optimizadas con Firebase Storage.
 
 ## 5. Integraciones y Herramientas Adicionales
+
 - [x] **Firebase Storage**: Para subir y servir imágenes de productos.
 - [ ] **Firebase Cloud Messaging**: Notificaciones para ofertas o actualizaciones de pedidos.
 - [ ] **Analytics**: Firebase Analytics para rastrear uso de la app (compras, búsquedas).
@@ -86,6 +91,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [ ] **Pruebas**: Crear tests unitarios (test/) para modelos y servicios. Usar Firebase Emulator Suite para pruebas locales.
 
 ## 7. Mejoras y Tareas Adicionales
+
 - [x] **Soporte para Modo Claro y Oscuro**: Implementar temas que respeten la configuración del sistema, con paleta de colores cálida (naranja como seed color) para reflejar el "Bazar de Saray".
 - [ ] **Personalización de Tema**: Agregar opción para que el usuario cambie manualmente entre claro/oscuro.
 - [x] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl. Implementado con archivos ARB para inglés y español, detectando automáticamente el idioma del sistema operativo.
@@ -107,6 +113,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
     - [ ] Recordatorios para completar compras abandonadas.
 
 ## Pruebas Pendientes
+
 - [x] Probar registro de usuario: Crear cuenta, verificar en Firebase Auth y Firestore.
 - [x] Probar login: Iniciar sesión con credenciales válidas.
 - [x] Probar logout: Cerrar sesión y verificar que regrese a login.
