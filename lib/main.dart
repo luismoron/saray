@@ -13,6 +13,7 @@ import 'screens/reset_password_screen.dart';
 import 'screens/catalog_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
+import 'screens/profile_screen.dart';
 import 'themes/app_theme.dart';
 
 void main() async {
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
           '/catalog': (context) => const CatalogScreen(),
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
+          '/profile': (context) => const ProfileScreen(),
         },
       ),
     );

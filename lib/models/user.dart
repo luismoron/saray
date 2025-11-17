@@ -4,7 +4,7 @@ class User {
   final String email;
   final String? phone;
   final String? address;
-  final String role; // 'customer' or 'admin'
+  final String role; // 'buyer', 'seller_pending', 'seller', 'admin'
 
   User({
     required this.id,
@@ -12,7 +12,7 @@ class User {
     required this.email,
     this.phone,
     this.address,
-    this.role = 'customer',
+    this.role = 'buyer',
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class User {
       email: json['email'],
       phone: json['phone'],
       address: json['address'],
-      role: json['role'] ?? 'customer',
+      role: json['role'] ?? 'buyer',
     );
   }
 

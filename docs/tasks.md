@@ -48,9 +48,13 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Pantalla de checkout: confirmar dirección, método de pago (implementado con pago contra entrega).
   - [x] Crear pedido en Firestore y actualizar stock.
   - [ ] Notificaciones push (usar Firebase Cloud Messaging) para confirmaciones.
-- [ ] **Perfil de Usuario**:
-  - [ ] Ver/editar datos personales, historial de pedidos.
-  - [ ] Para admins: panel para agregar/editar productos.
+- [x] **Perfil de Usuario**:
+  - [x] Ver/editar datos personales, historial de pedidos.
+  - [x] Para admins: panel para agregar/editar productos.
+- [x] **Sistema de Roles de Usuario**:
+  - [x] Implementar roles: buyer (comprador), seller_pending, seller (aprobado), admin.
+  - [x] Solicitud de vendedor con aprobación admin.
+  - [x] Panel admin para gestionar solicitudes.
 
 ## 4. Diseño de UI/UX
 - [x] **Tema y Estilos**:

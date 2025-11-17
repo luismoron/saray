@@ -52,9 +52,19 @@ Aquí se documentará toda la lógica implementada, decisiones tomadas y pasos r
   - Actualizado docs.md con resumen completo del proyecto, tecnologías, arquitectura y avances.
   - Actualizado logic.md con detalles de implementaciones recientes.
 
-- **Próximos Pasos Actualizados**:
-  - Implementar pantalla de perfil de usuario (ver/editar datos, historial de pedidos).
-  - Crear panel de admin para gestionar productos.
-  - Integrar Firebase Cloud Messaging para notificaciones push.
-  - Realizar pruebas exhaustivas del carrito, checkout y notificaciones.
-  - Mejorar UI/UX con iconos, responsive design y optimizaciones de rendimiento.
+- **Sistema de Roles Actualizado**:
+  - Cambiado modelo User: roles ahora 'buyer' (comprador), 'seller_pending' (solicitud enviada), 'seller' (aprobado), 'admin'.
+  - Por defecto, nuevos usuarios son 'buyer'.
+  - En ProfileScreen: botón para solicitar ser vendedor, lógica para mostrar estado de solicitud.
+  - Panel admin: lista de solicitudes pendientes con botones para aprobar/rechazar.
+  - Colección Firestore 'seller_requests' para manejar solicitudes.
+
+### Fecha: 17 de noviembre de 2025 (Actualización)
+
+- **Implementación Completa del Perfil de Usuario con Sistema de Roles**:
+  - ProfileScreen completamente funcional: muestra datos personales, historial de pedidos, opciones de edición.
+  - Lógica de roles implementada: usuarios buyer pueden solicitar ser seller, admins pueden aprobar/rechazar.
+  - Panel admin integrado en ProfileScreen para usuarios con rol 'admin'.
+  - Manejo de estados: buyer, seller_pending, seller, admin con UI apropiada para cada uno.
+  - Integración con Firestore para actualizar roles y manejar solicitudes de vendedor.
+  - Validaciones y manejo de errores en solicitudes y aprobaciones.

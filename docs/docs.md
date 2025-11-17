@@ -32,6 +32,9 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - Temas claro/oscuro.
 - Internacionalización.
 - Almacenamiento de imágenes en Firebase Storage.
+- Perfil de Usuario: Ver/editar datos personales, historial de pedidos, panel para admins.
+- Sistema de Roles: Compradores por defecto, solicitud de vendedor con aprobación admin.
+- **Sistema de Roles**: Compradores por defecto, solicitud para ser vendedor con aprobación admin.
 - Permisos configurados para Android e iOS.
 
 ## Avances Recientes (17 de noviembre de 2025)
@@ -40,9 +43,10 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - Verificado entorno de desarrollo con flutter doctor.
 - Implementado StorageService para subir imágenes de productos.
 - Integrado tema personalizado claro/oscuro con colores específicos.
+- Actualizado sistema de roles: compradores por defecto, solicitud de vendedor con aprobación admin.
 
 ## Próximos Pasos
-- Implementar perfil de usuario y panel de admin.
+- Crear panel de admin para gestionar productos.
 - Agregar notificaciones push con FCM.
 - Mejorar UI/UX con iconos y responsive design.
 - Realizar pruebas exhaustivas del carrito y checkout.
