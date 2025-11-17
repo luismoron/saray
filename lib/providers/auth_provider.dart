@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';
 
@@ -76,5 +77,28 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> resetPassword(String email) async {
     await _authService.resetPassword(email);
+  }
+
+  // Método temporal para asignar rol admin (desarrollo)
+  // TODO: Remover después de asignar admin inicial
+  Future<bool> assignAdminRole() async {
+    if (user == null) return false;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.id)
+          .update({'role': 'admin'});
+
+      // Actualizar usuario local
+      final updatedUser = user!.copyWith(role: 'admin');
+      _user = updatedUser;
+      notifyListeners();
+
+      return true;
+    } catch (e) {
+      print('Error assigning admin role: $e');
+      return false;
+    }
   }
 }

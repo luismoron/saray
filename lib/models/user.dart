@@ -36,4 +36,33 @@ class User {
       'role': role,
     };
   }
+
+  factory User.fromFirestore(Map<String, dynamic> data, String id) {
+    return User(
+      id: id,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      phone: data['phone'],
+      address: data['address'],
+      role: data['role'] ?? 'buyer',
+    );
+  }
+
+  User copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? phone,
+    String? address,
+    String? role,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      role: role ?? this.role,
+    );
+  }
 }

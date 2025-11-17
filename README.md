@@ -1,74 +1,104 @@
 # Bazar de Saray
 
-A Flutter-based e-commerce app for selling spare parts for various household appliances and more. Built with Firebase for authentication, database, and storage services.
+Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos de electrodomésticos y otros productos. Construida con Firebase para autenticación, base de datos y servicios de almacenamiento.
 
-## Features
+## 🚀 Características Implementadas
 
-- **User Authentication**: Secure login and registration using Firebase Auth.
-- **Product Catalog**: Browse and search for spare parts and appliances.
-- **Shopping Cart**: Add items to cart, manage quantities, and proceed to checkout.
-- **Order Management**: Place orders and track status.
-- **Admin Panel**: For managing products and orders (future feature).
-- **Cross-Platform**: Runs on Android, iOS, and Web.
+- **✅ Autenticación de Usuarios**: Login y registro seguro con Firebase Auth.
+- **✅ Catálogo de Productos**: Navegar y buscar repuestos y electrodomésticos con filtros.
+- **✅ Carrito de Compras**: Agregar productos, gestionar cantidades y proceder al checkout.
+- **✅ Gestión de Pedidos**: Realizar pedidos y seguimiento de estado.
+- **✅ Sistema de Roles**: Compradores, vendedores y administradores.
+- **✅ Panel de Administración**: Gestión completa de productos con subida de imágenes.
+- **✅ Temas Claro/Oscuro**: Adaptable a la configuración del sistema.
+- **✅ Internacionalización**: Soporte para español e inglés.
+- **🔄 Próximas**: Notificaciones push, pruebas exhaustivas del carrito.
 
-## Technologies Used
+## 🛠️ Tecnologías Utilizadas
 
-- **Flutter**: UI framework for building natively compiled applications.
+- **Flutter**: Framework UI para aplicaciones nativas compiladas.
 - **Firebase**:
-  - Auth: User authentication.
-  - Firestore: NoSQL database for products, users, and orders.
-  - Storage: For product images.
-  - Cloud Messaging: Push notifications (planned).
+  - Auth: Autenticación de usuarios.
+  - Firestore: Base de datos NoSQL para productos, usuarios y pedidos.
+  - Storage: Almacenamiento de imágenes de productos.
+  - Cloud Messaging: Notificaciones push (planeado).
+- **Provider**: Gestión de estado.
+- **Material Design 3**: UI/UX consistente.
 
-## Getting Started
+## 📱 Plataforma
 
-### Prerequisites
+**Android únicamente** - La app está diseñada exclusivamente para dispositivos Android.
 
-- Flutter SDK (version 3.10.0 or higher)
+## 🏁 Inicio Rápido
+
+### Prerrequisitos
+
+- Flutter SDK (versión 3.10.0 o superior)
 - Dart SDK
-- Firebase account and project setup
+- Cuenta Firebase y proyecto configurado
 
-### Installation
+### Instalación
 
-1. Clone the repository:
+1. Clona el repositorio:
    ```bash
-   git clone https://github.com/yourusername/bazar.git
-   cd bazar
+   git clone https://github.com/luismoron/saray.git
+   cd saray
    ```
 
-2. Install dependencies:
+2. Instala dependencias:
    ```bash
    flutter pub get
    ```
 
-3. Set up Firebase:
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
-   - Add Android/iOS/Web apps and download config files (google-services.json, GoogleService-Info.plist).
-   - Place config files in the appropriate directories (android/app/, ios/Runner/, web/).
+3. Configura Firebase:
+   - Crea un proyecto en [Firebase Console](https://console.firebase.google.com/).
+   - Agrega la app Android y descarga google-services.json.
+   - Coloca el archivo en `android/app/`.
 
-4. Run the app:
+4. Ejecuta la app:
    ```bash
    flutter run
    ```
 
-### Project Structure
+### Estructura del Proyecto
 
-- `lib/`: Main application code.
-  - `models/`: Data models (User, Product, Order).
-  - `screens/`: UI screens (Login, Home, Cart, etc.).
-  - `services/`: Firebase services and business logic.
-  - `widgets/`: Reusable UI components.
-- `docs/`: Project documentation (tasks, rules, logic).
-- `test/`: Unit tests.
+- `lib/`: Código principal de la aplicación.
+  - `models/`: Modelos de datos (User, Product, Order).
+  - `screens/`: Pantallas UI (Login, Home, Cart, Admin, etc.).
+  - `services/`: Servicios Firebase y lógica de negocio.
+  - `widgets/`: Componentes UI reutilizables.
+  - `providers/`: Gestión de estado con Provider.
+- `docs/`: Documentación del proyecto (tareas, reglas, lógica).
+- `test/`: Tests unitarios.
 
-## Contributing
+## 📊 Estado del Proyecto (17 de noviembre de 2025)
 
-Contributions are welcome! Please fork the repository and submit a pull request.
+### ✅ Completado
+- Autenticación completa con Firebase Auth
+- Catálogo de productos con filtros y búsqueda
+- Carrito de compras persistente
+- Sistema de roles (buyer, seller, admin)
+- Panel de administración funcional
+- Temas claro/oscuro
+- Internacionalización (ES/EN)
 
-## License
+### 🔄 En Progreso
+- Pruebas exhaustivas del carrito y checkout
+- Notificaciones push con FCM
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### 📋 Próximos Pasos
+- Optimización de rendimiento
+- Sistema de reseñas y calificaciones
+- Búsqueda avanzada y filtros adicionales
 
-## Contact
+## 🤝 Contribuciones
 
-For questions or support, contact [your email or contact info].
+¡Las contribuciones son bienvenidas! Por favor, haz fork del repositorio y envía un pull request.
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 📞 Contacto
+
+Para preguntas o soporte, contacta al desarrollador.

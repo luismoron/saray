@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../models/order.dart' as order_model;
@@ -31,7 +30,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final cartProvider = Provider.of<CartProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);

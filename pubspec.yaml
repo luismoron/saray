@@ -50,6 +50,12 @@ dependencies:
   # Image caching
   cached_network_image: ^3.0.0
 
+  # Image picker
+  image_picker: ^1.0.0
+
+  # Path manipulation
+  path: ^1.8.0
+
   # Internationalization
   intl: ^0.20.2
   flutter_localizations:

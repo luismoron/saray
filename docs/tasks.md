@@ -55,6 +55,10 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Implementar roles: buyer (comprador), seller_pending, seller (aprobado), admin.
   - [x] Solicitud de vendedor con aprobación admin.
   - [x] Panel admin para gestionar solicitudes.
+- [x] **Panel de Administración**:
+  - [x] Pantalla de admin con tabs para productos y solicitudes.
+  - [x] Gestión completa de productos: agregar, editar, eliminar con imágenes.
+  - [x] Integración con Firebase Storage para subir imágenes de productos.
 
 ## 4. Diseño de UI/UX
 - [x] **Tema y Estilos**:
@@ -124,5 +128,14 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [ ] Flujo completo: Login → Catálogo → Carrito → Checkout → Confirmación.
   - [ ] Verificar manejo de errores de red.
   - [ ] Verificar comportamiento offline/online.
+- [x] **Pruebas del Panel de Administración**:
+  - [x] Asignar rol admin a usuario existente.
+  - [x] Acceder al panel de administración desde perfil.
+  - [x] Ver lista de productos en el panel admin.
+  - [x] Agregar nuevo producto con imágenes.
+  - [x] Editar producto existente.
+  - [x] Eliminar producto con confirmación.
+  - [x] Verificar subida de imágenes a Firebase Storage.
+  - [x] Verificar actualización en tiempo real del catálogo.
 
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?

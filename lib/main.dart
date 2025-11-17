@@ -14,6 +14,8 @@ import 'screens/catalog_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/admin_screen.dart';
+import 'screens/stock_test_screen.dart';
 import 'themes/app_theme.dart';
 
 void main() async {
@@ -62,6 +64,8 @@ class MyApp extends StatelessWidget {
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
           '/profile': (context) => const ProfileScreen(),
+          '/admin': (context) => const AdminScreen(),
+          '/stock-test': (context) => const StockTestScreen(),
         },
       ),
     );

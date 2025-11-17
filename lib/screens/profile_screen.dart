@@ -66,6 +66,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () => _showEditProfileDialog(context, user),
                       child: const Text('Editar Perfil'),
                     ),
+                    // TODO: Remover después de asignar admin inicial
+                    if (user.role != 'admin') ...[
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () => _assignAdminRole(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text('Asignar Rol Admin (Temporal)'),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -141,12 +152,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          // TODO: Navegar a pantalla de gestión de productos
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Funcionalidad próximamente')),
-                          );
+                          Navigator.of(context).pushNamed('/admin');
                         },
                         child: const Text('Gestionar Productos'),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/stock-test');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                        ),
+                        child: const Text('🧪 Probar Sistema de Stock'),
                       ),
                       const SizedBox(height: 16),
                       const Text('Solicitudes de Vendedores Pendientes:'),
@@ -410,5 +428,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  void _assignAdminRole(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Asignar Rol Admin'),
+        content: const Text('¿Estás seguro de que quieres asignarte el rol de administrador? Esta acción es irreversible.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await authProvider.assignAdminRole();
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Rol admin asignado exitosamente')),
+        );
+        setState(() {}); // Refrescar la UI
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Error al asignar rol admin'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
