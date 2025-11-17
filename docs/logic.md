@@ -78,7 +78,25 @@ Aquí se documentará toda la lógica implementada, decisiones tomadas y pasos r
   - Navegación desde ProfileScreen para usuarios admin.
   - Actualización automática de la lista de productos tras cambios.
 
-### Fecha: 17 de noviembre de 2025 (Pruebas y Validación)
+### Fecha: 17 de noviembre de 2025 (Historial de Pedidos Completo)
+
+- **Implementación del Historial de Pedidos Completo**:
+  - Creada OrderHistoryScreen como pantalla dedicada con funcionalidades avanzadas.
+  - Implementada navegación desde ProfileScreen con botón dedicado en lugar del historial integrado.
+  - Agregada funcionalidad de búsqueda por ID de pedido con TextField y filtrado en tiempo real.
+  - Implementados filtros por estado de pedido (todos, pendiente, confirmado, preparando, enviado, entregado, cancelado).
+  - Creada vista detallada de pedidos usando DraggableScrollableSheet con scroll interno.
+  - Mostradas imágenes de productos, cantidades, precios individuales y totales.
+  - Integración completa con Firebase Firestore para consultas en tiempo real con filtros.
+  - Estados visuales con colores e iconos apropiados para cada estado de pedido.
+  - Manejo de errores y estados de carga apropiados.
+  - Limpieza del código: removidos métodos no usados (_showOrderDetails) e imports innecesarios del ProfileScreen.
+  - Actualización de rutas en main.dart para incluir '/order-history'.
+
+- **Mejoras en la Arquitectura**:
+  - Separación clara entre vista resumida (ProfileScreen) y vista detallada (OrderHistoryScreen).
+  - Mejor organización del código con responsabilidades bien definidas.
+  - UI/UX mejorada con navegación intuitiva y filtros funcionales.
 
 - **Pruebas del Panel de Administración Realizadas**:
   - Asignación exitosa de rol admin mediante botón temporal en perfil.
@@ -101,5 +119,6 @@ Aquí se documentará toda la lógica implementada, decisiones tomadas y pasos r
   - ✅ Carrito de compras persistente.
   - ✅ Sistema de roles con panel de administración probado.
   - ✅ Gestión completa de productos por administradores.
+  - ✅ Historial de pedidos completo con pantalla dedicada.
   - 🔄 Pendiente: Pruebas exhaustivas de carrito y checkout.
   - 🔄 Pendiente: Implementación de notificaciones push.

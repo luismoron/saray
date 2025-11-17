@@ -51,6 +51,12 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] **Perfil de Usuario**:
   - [x] Ver/editar datos personales, historial de pedidos.
   - [x] Para admins: panel para agregar/editar productos.
+- [x] **Historial de Pedidos Completo**:
+  - [x] Pantalla dedicada para ver todos los pedidos del usuario.
+  - [x] Filtros por estado de pedido (pendiente, confirmado, enviado, etc.).
+  - [x] Búsqueda por ID de pedido.
+  - [x] Vista detallada de cada pedido con productos, precios y estado.
+  - [x] Navegación desde el perfil de usuario.
 - [x] **Sistema de Roles de Usuario**:
   - [x] Implementar roles: buyer (comprador), seller_pending, seller (aprobado), admin.
   - [x] Solicitud de vendedor con aprobación admin.

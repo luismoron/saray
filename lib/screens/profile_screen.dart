@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/auth_provider.dart';
-import '../models/order.dart' as my_order;
 import '../models/user.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -83,58 +82,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Historial de pedidos
-            Text(
-              'Historial de Pedidos',
-              style: Theme.of(context).textTheme.titleLarge,
+            // Historial de pedidos - Botón para navegar a pantalla dedicada
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.history, color: Colors.orange),
+                title: const Text('Historial de Pedidos'),
+                subtitle: const Text('Ver todos tus pedidos anteriores'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/order-history');
+                },
+              ),
             ),
             const SizedBox(height: 16),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('orders')
-                  .where('userId', isEqualTo: user.id)
-                  .orderBy('createdAt', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
-
-                final orders = snapshot.data?.docs.map((doc) {
-                  return my_order.Order.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
-                }).toList() ?? [];
-
-                if (orders.isEmpty) {
-                  return const Center(child: Text('No tienes pedidos aún.'));
-                }
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: orders.length,
-                  itemBuilder: (context, index) {
-                    final order = orders[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      child: ListTile(
-                        title: Text('Pedido #${order.id.substring(0, 8)}'),
-                        subtitle: Text(
-                          'Total: \$${order.total.toStringAsFixed(2)} - Estado: ${order.status.toString().split('.').last}',
-                        ),
-                        trailing: Text(
-                          '${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year}',
-                        ),
-                        onTap: () => _showOrderDetails(context, order),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
 
             // Panel de admin (solo si es admin)
             if (user.role == 'admin') ...[
@@ -397,37 +357,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     }
-  }
-
-  void _showOrderDetails(BuildContext context, my_order.Order order) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text('Detalles del Pedido #${order.id.substring(0, 8)}'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Estado: ${order.status.toString().split('.').last}'),
-              Text('Total: \$${order.total.toStringAsFixed(2)}'),
-              Text('Dirección: ${order.deliveryAddress}'),
-              Text('Teléfono: ${order.phoneNumber}'),
-              if (order.notes != null) Text('Notas: ${order.notes}'),
-              const SizedBox(height: 16),
-              const Text('Productos:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...order.items.map((item) => Text('- ${item.product.name} x${item.quantity}')),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _assignAdminRole(BuildContext context) async {

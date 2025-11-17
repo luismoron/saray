@@ -16,6 +16,7 @@ import 'screens/checkout_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/admin_screen.dart';
 import 'screens/stock_test_screen.dart';
+import 'screens/order_history_screen.dart';
 import 'themes/app_theme.dart';
 
 void main() async {
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
           '/profile': (context) => const ProfileScreen(),
           '/admin': (context) => const AdminScreen(),
           '/stock-test': (context) => const StockTestScreen(),
+          '/order-history': (context) => const OrderHistoryScreen(),
         },
       ),
     );
