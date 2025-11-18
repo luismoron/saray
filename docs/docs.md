@@ -37,8 +37,8 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - Internacionalización.
 - Almacenamiento de imágenes en Firebase Storage.
 - Perfil de Usuario: Ver/editar datos personales, historial de pedidos, panel para admins.
-- Sistema de Roles: Compradores por defecto, solicitud de vendedor con aprobación admin.
-- Panel de Administración: Gestión completa de productos (agregar, editar, eliminar con imágenes), aprobación de solicitudes de vendedor.
+- **Sistema de Roles Reforzado**: Buyers solo pueden comprar, admins controlan permisos de venta. Protección de rutas con RouteGuard.
+- **Panel de Administración Expandido**: Nueva tab "Usuarios" para gestión completa de roles por parte de admins.
 - **Sistema de Roles**: Compradores por defecto, solicitud para ser vendedor con aprobación admin.
 - Permisos configurados para Android e iOS.
 
@@ -75,14 +75,26 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.
 - 🔄 **Notificaciones**: Pendiente implementación.
 
-## Próximos Pasos
+## Roadmap de Mejoras Futuras
 
-- Realizar pruebas exhaustivas finales del carrito de compras y proceso de checkout.
-- Implementar notificaciones push con Firebase Cloud Messaging.
-- Mejorar UI/UX: agregar iconos, optimizar responsive design.
-- Optimizar rendimiento: lazy loading, caching de imágenes.
-- Implementar sistema de reseñas y calificaciones de productos.
-- Agregar funcionalidad de búsqueda avanzada y filtros adicionales.
-- **PENDIENTE**: Resolver dependencias de paquetes obsoletos (Firebase packages necesitan actualización).
+### 🟢 FASE 2 - Optimización de Rendimiento
+
+- Lazy loading en listas largas para mejor rendimiento
+- Caching inteligente de imágenes de productos
+- Firebase Analytics para métricas de uso y compras
+
+### 🟢 FASE 3 - Funcionalidades Avanzadas
+
+- Sistema de reseñas y calificaciones de productos
+- Búsqueda avanzada con filtros adicionales (precio, ubicación, etc.)
+- Google Maps para selección visual de direcciones de entrega
+- Integración de pagos reales con Stripe
+
+### 🟢 FASE 4 - Sistema de Notificaciones Mejorado
+
+- Animaciones personalizadas para notificaciones
+- Notificaciones tipo toast más elegantes
+- Centro de notificaciones in-app con historial
+- Notificaciones contextuales según estado de la app
 
 Para más detalles, consulta `logic.md` para lógica implementada, `rules.md` para reglas del proyecto, y `tasks.md` para la lista completa de tareas.

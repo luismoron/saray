@@ -65,8 +65,14 @@ class MyApp extends StatelessWidget {
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
           '/profile': (context) => const ProfileScreen(),
-          '/admin': (context) => const AdminScreen(),
-          '/stock-test': (context) => const StockTestScreen(),
+          '/admin': (context) => const RouteGuard(
+                requiredRole: 'admin',
+                child: const AdminScreen(),
+              ),
+          '/stock-test': (context) => const RouteGuard(
+                requiredRole: 'admin',
+                child: const StockTestScreen(),
+              ),
           '/order-history': (context) => const OrderHistoryScreen(),
         },
       ),
@@ -97,5 +103,69 @@ class AuthWrapper extends StatelessWidget {
     } else {
       return const LoginScreen();
     }
+  }
+}
+
+class RouteGuard extends StatelessWidget {
+  final String requiredRole;
+  final Widget child;
+
+  const RouteGuard({
+    super.key,
+    required this.requiredRole,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
+
+    // Si no hay usuario autenticado, redirigir a login
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Si el usuario no tiene el rol requerido, mostrar acceso denegado
+    if (user.role != requiredRole) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Acceso Denegado'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.lock_outline,
+                size: 80,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No tienes permisos para acceder a esta sección',
+                style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                },
+                child: const Text('Volver al Inicio'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Si tiene el rol correcto, mostrar el widget protegido
+    return child;
   }
 }

@@ -65,6 +65,8 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Implementar roles: buyer (comprador), seller_pending, seller (aprobado), admin.
   - [x] Solicitud de vendedor con aprobación admin.
   - [x] Panel admin para gestionar solicitudes.
+  - [x] Protección de rutas con RouteGuard para acceso basado en roles.
+  - [x] Buyers solo pueden comprar, admins controlan permisos de venta.
 - [x] **Panel de Administración**:
   - [x] Pantalla de admin con tabs para productos y solicitudes.
   - [x] Gestión completa de productos: agregar, editar, eliminar con imágenes.

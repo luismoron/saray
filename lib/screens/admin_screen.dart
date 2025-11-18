@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/product_provider.dart';
 import '../models/product.dart';
 import '../services/storage_service.dart';
@@ -19,7 +20,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -38,6 +39,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           tabs: const [
             Tab(text: 'Productos'),
             Tab(text: 'Solicitudes'),
+            Tab(text: 'Usuarios'),
           ],
           labelColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
           unselectedLabelColor: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withOpacity(0.7),
@@ -49,6 +51,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         children: [
           _buildProductsTab(),
           _buildRequestsTab(),
+          _buildUsersTab(),
         ],
       ),
       floatingActionButton: _tabController.index == 0
@@ -58,6 +61,103 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               tooltip: 'Agregar Producto',
             )
           : null,
+    );
+  }
+
+  Widget _buildUsersTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                Text('Error: ${snapshot.error}'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => setState(() {}),
+                  child: const Text('Reintentar'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final users = snapshot.data?.docs ?? [];
+
+        if (users.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.people_outline, size: 64, color: Colors.grey),
+                SizedBox(height: 16),
+                Text('No hay usuarios registrados'),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final userDoc = users[index];
+            final userData = userDoc.data() as Map<String, dynamic>;
+            final userId = userDoc.id;
+            final name = userData['name'] ?? 'Sin nombre';
+            final email = userData['email'] ?? 'Sin email';
+            final role = userData['role'] ?? 'buyer';
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: CircleAvatar(
+                  child: Text(name.isNotEmpty ? name[0].toUpperCase() : '?'),
+                ),
+                title: Text(name),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(email),
+                    Text(
+                      'Rol: ${_getRoleDisplayName(role)}',
+                      style: TextStyle(
+                        color: _getRoleColor(role),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (value) => _changeUserRole(context, userId, value, name),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'buyer',
+                      child: Text('Comprador'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'seller',
+                      child: Text('Vendedor'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'admin',
+                      child: Text('Administrador'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -172,6 +272,60 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         ],
       ),
     );
+  }
+
+  String _getRoleDisplayName(String role) {
+    switch (role) {
+      case 'buyer':
+        return 'Comprador';
+      case 'seller':
+        return 'Vendedor';
+      case 'admin':
+        return 'Administrador';
+      default:
+        return role;
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case 'buyer':
+        return Colors.blue;
+      case 'seller':
+        return Colors.green;
+      case 'admin':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _changeUserRole(BuildContext context, String userId, String newRole, String userName) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'role': newRole});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rol de $userName cambiado a ${_getRoleDisplayName(newRole)}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cambiar rol: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 }
 

@@ -93,10 +93,31 @@ Aquí se documentará toda la lógica implementada, decisiones tomadas y pasos r
   - Limpieza del código: removidos métodos no usados (_showOrderDetails) e imports innecesarios del ProfileScreen.
   - Actualización de rutas en main.dart para incluir '/order-history'.
 
-- **Mejoras en la Arquitectura**:
-  - Separación clara entre vista resumida (ProfileScreen) y vista detallada (OrderHistoryScreen).
-  - Mejor organización del código con responsabilidades bien definidas.
-  - UI/UX mejorada con navegación intuitiva y filtros funcionales.
+### Fecha: 18 de noviembre de 2025 (Sistema de Roles Reforzado)
+
+- **Nueva Lógica de Roles Implementada**:
+  - Buyers: Solo pueden comprar productos, ver historial de pedidos, editar perfil personal.
+  - Sellers: Pueden vender productos (acceso futuro), además de todas las funciones de buyer.
+  - Admins: Control total - gestionar productos, usuarios, roles, y todas las funciones.
+  - Eliminada solicitud automática de vendedores - solo admins pueden asignar permisos.
+
+- **Protección de Rutas con RouteGuard**:
+  - Creado widget RouteGuard para proteger rutas administrativas.
+  - Rutas '/admin' y '/stock-test' requieren rol 'admin'.
+  - Buyers que intenten acceder ven pantalla "Acceso Denegado".
+  - Redirección automática a login si no autenticado.
+
+- **Panel de Administración Expandido**:
+  - Nueva tab "Usuarios" para gestión completa de roles.
+  - Lista de todos los usuarios con información de rol.
+  - Menú desplegable para cambiar roles (Comprador/Vendedor/Administrador).
+  - Colores distintivos por rol en la interfaz.
+  - Confirmación visual de cambios de rol.
+
+- **Registro de Usuarios**:
+  - Rol por defecto: 'buyer' (antes 'customer').
+  - Eliminada opción de solicitud de vendedor para usuarios normales.
+  - Consistencia en nomenclatura de roles.
 
 ### Fecha: 18 de noviembre de 2025 (Solución de Índices Firestore)
 

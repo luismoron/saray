@@ -28,7 +28,7 @@ class AuthService {
           'id': user.uid,
           'name': name,
           'email': email,
-          'role': 'customer',
+          'role': 'buyer',
           'createdAt': FieldValue.serverTimestamp(),
         });
         print('AuthService: Firestore save success');

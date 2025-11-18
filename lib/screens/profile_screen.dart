@@ -50,12 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildInfoRow('Dirección', user.address ?? 'No especificada'),
                     _buildInfoRow('Rol', _getRoleDisplayName(user.role)),
                     const SizedBox(height: 16),
-                    if (user.role == 'buyer') ...[
-                      ElevatedButton(
-                        onPressed: () => _requestSellerStatus(context, user.id),
-                        child: const Text('Solicitar ser Vendedor'),
-                      ),
-                    ] else if (user.role == 'seller_pending') ...[
+                    // Los usuarios normales no pueden solicitar ser vendedores
+                    // Solo los admins pueden asignar roles desde el panel de administración
+                    if (user.role == 'seller_pending') ...[
                       const Text('Solicitud de vendedor enviada, esperando aprobación.'),
                     ] else if (user.role == 'seller') ...[
                       const Text('Eres vendedor aprobado.'),
