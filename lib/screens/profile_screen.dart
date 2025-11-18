@@ -246,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Solicitud enviada. Esperando aprobación.')),
+          const SnackBar(content: Text('Solicitud enviada. Esperando aprobación.'), duration: Duration(seconds: 3)),
         );
         // Refrescar pantalla
         setState(() {});
@@ -254,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('Error: $e'), duration: Duration(seconds: 3)),
         );
       }
     }
@@ -297,7 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Por ahora, solo cerrar
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Perfil actualizado (simulado)')),
+                const SnackBar(content: Text('Perfil actualizado (simulado)'), duration: Duration(seconds: 3)),
               );
             },
             child: const Text('Guardar'),

@@ -251,6 +251,7 @@ class ProductCard extends StatelessWidget {
         const SnackBar(
           content: Text('Error al agregar el producto al carrito. Inténtalo de nuevo.'),
           backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
         ),
       );
     }

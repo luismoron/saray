@@ -120,23 +120,23 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] Probar reset password: Enviar email de recuperación.
 - [x] Verificar navegación: De login a register, y viceversa.
 - [x] Probar en emulador/dispositivo Android.
-- [ ] **Pruebas del Carrito de Compras**:
-  - [ ] Agregar productos al carrito y verificar persistencia.
-  - [ ] Modificar cantidades y verificar actualización en tiempo real.
-  - [ ] Remover productos y verificar actualización.
-  - [ ] Limpiar carrito completo.
-  - [ ] Verificar que el carrito persista entre sesiones de usuario.
-- [ ] **Pruebas del Proceso de Checkout**:
-  - [ ] Completar formulario de checkout con datos válidos.
-  - [ ] Verificar creación de pedido en Firestore.
-  - [ ] Verificar actualización automática del stock.
-  - [ ] Verificar limpieza del carrito después del pedido.
-  - [ ] Verificar navegación de vuelta al home después del pedido.
-- [ ] **Pruebas de Notificaciones**:
-  - [ ] Verificar notificaciones al agregar productos.
-  - [ ] Verificar notificaciones al modificar/remover del carrito.
-  - [ ] Verificar notificaciones de error.
-  - [ ] Verificar que las notificaciones se oculten automáticamente.
+- [x] **Pruebas del Carrito de Compras**:
+  - [x] Agregar productos al carrito y verificar persistencia.
+  - [x] Modificar cantidades y verificar actualización en tiempo real.
+  - [x] Remover productos y verificar actualización.
+  - [x] Limpiar carrito completo.
+  - [x] Verificar que el carrito persista entre sesiones de usuario.
+- [x] **Pruebas del Proceso de Checkout**:
+  - [x] Completar formulario de checkout con datos válidos.
+  - [x] Verificar creación de pedido en Firestore.
+  - [x] Verificar actualización automática del stock.
+  - [x] Verificar limpieza del carrito después del pedido.
+  - [x] Verificar navegación de vuelta al home después del pedido.
+- [x] **Pruebas de Notificaciones**:
+  - [x] Verificar notificaciones al agregar productos.
+  - [x] Verificar notificaciones al modificar/remover del carrito.
+  - [x] Verificar notificaciones de error.
+  - [x] Verificar que las notificaciones se oculten automáticamente.
 - [ ] **Pruebas de Integración**:
   - [ ] Flujo completo: Login → Catálogo → Carrito → Checkout → Confirmación.
   - [ ] Verificar manejo de errores de red.
