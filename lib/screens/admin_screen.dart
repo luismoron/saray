@@ -347,6 +347,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   final _categoryController = TextEditingController();
 
   List<File> _selectedImages = [];
+  List<String> _existingImageUrls = [];
   bool _isLoading = false;
 
   @override
@@ -358,6 +359,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       _priceController.text = widget.product!.price.toString();
       _stockController.text = widget.product!.stock.toString();
       _categoryController.text = widget.product!.category;
+      _existingImageUrls = List.from(widget.product!.imageUrls);
     }
   }
 
@@ -440,36 +442,90 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
               const SizedBox(height: 16),
 
               // Imágenes
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Imágenes:'),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    onPressed: _pickImages,
-                    icon: const Icon(Icons.image),
-                    label: const Text('Seleccionar'),
+                  Row(
+                    children: [
+                      const Text('Imágenes:'),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: _pickImages,
+                        icon: const Icon(Icons.image),
+                        label: const Text('Seleccionar'),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
+                  // Mostrar imágenes existentes
+                  if (_existingImageUrls.isNotEmpty || _selectedImages.isNotEmpty)
+                    SizedBox(
+                      height: 120,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _existingImageUrls.length + _selectedImages.length,
+                        itemBuilder: (context, index) {
+                          if (index < _existingImageUrls.length) {
+                            // Imagen existente
+                            return Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    _existingImageUrls[index],
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.image_not_supported, size: 80),
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                      onPressed: () => _removeExistingImage(index),
+                                      iconSize: 20,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            // Nueva imagen seleccionada
+                            final newImageIndex = index - _existingImageUrls.length;
+                            return Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Stack(
+                                children: [
+                                  Image.file(
+                                    _selectedImages[newImageIndex],
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                      onPressed: () => _removeNewImage(newImageIndex),
+                                      iconSize: 20,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
                 ],
               ),
-              if (_selectedImages.isNotEmpty)
-                SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _selectedImages.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Image.file(
-                          _selectedImages[index],
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                  ),
-                ),
             ],
           ),
         ),
@@ -499,9 +555,21 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
     if (pickedFiles.isNotEmpty) {
       setState(() {
-        _selectedImages = pickedFiles.map((file) => File(file.path)).toList();
+        _selectedImages.addAll(pickedFiles.map((file) => File(file.path)).toList());
       });
     }
+  }
+
+  void _removeExistingImage(int index) {
+    setState(() {
+      _existingImageUrls.removeAt(index);
+    });
+  }
+
+  void _removeNewImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
   }
 
   Future<void> _saveProduct() async {
@@ -513,34 +581,83 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
       final storageService = StorageService();
 
-      // Subir imágenes si hay nuevas
-      List<String> imageUrls = widget.product?.imageUrls ?? [];
-      if (_selectedImages.isNotEmpty) {
-        final uploadedUrls = await storageService.uploadProductImages(
-          _selectedImages,
-          widget.product?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        );
-        imageUrls = uploadedUrls;
-      }
-
-      final product = Product(
-        id: widget.product?.id ?? '',
-        name: _nameController.text,
-        description: _descriptionController.text,
-        price: double.parse(_priceController.text),
-        category: _categoryController.text,
-        stock: int.parse(_stockController.text),
-        imageUrls: imageUrls,
-        createdAt: widget.product?.createdAt ?? DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      // Combinar imágenes existentes con nuevas
+      List<String> imageUrls = List.from(_existingImageUrls); // Mantener imágenes existentes no eliminadas
 
       bool success;
+      String finalProductId;
+
       if (widget.product != null) {
-        success = await productProvider.updateProduct(widget.product!.id, product);
+        // Producto existente - subir imágenes con ID existente
+        finalProductId = widget.product!.id;
+
+        // Subir nuevas imágenes si hay
+        if (_selectedImages.isNotEmpty) {
+          final uploadedUrls = await storageService.uploadProductImages(
+            _selectedImages,
+            finalProductId,
+          );
+          imageUrls.addAll(uploadedUrls); // Agregar nuevas imágenes al final
+        }
+
+        final product = Product(
+          id: finalProductId,
+          name: _nameController.text,
+          description: _descriptionController.text,
+          price: double.parse(_priceController.text),
+          category: _categoryController.text,
+          stock: int.parse(_stockController.text),
+          imageUrls: imageUrls,
+          createdAt: widget.product!.createdAt,
+          updatedAt: DateTime.now(),
+        );
+
+        success = await productProvider.updateProduct(finalProductId, product);
       } else {
-        final productId = await productProvider.addProduct(product);
-        success = productId != null;
+        // Producto nuevo - guardar primero para obtener ID real, luego subir imágenes
+        final tempProduct = Product(
+          id: '', // ID vacío para nuevo producto
+          name: _nameController.text,
+          description: _descriptionController.text,
+          price: double.parse(_priceController.text),
+          category: _categoryController.text,
+          stock: int.parse(_stockController.text),
+          imageUrls: [], // URLs vacías inicialmente
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        // Guardar producto para obtener ID real
+        final productId = await productProvider.addProduct(tempProduct);
+        if (productId == null) {
+          throw Exception('Error al crear producto');
+        }
+
+        finalProductId = productId;
+
+        // Subir imágenes con ID real
+        if (_selectedImages.isNotEmpty) {
+          final uploadedUrls = await storageService.uploadProductImages(
+            _selectedImages,
+            finalProductId,
+          );
+          imageUrls.addAll(uploadedUrls);
+        }
+
+        // Actualizar producto con URLs de imágenes
+        final finalProduct = Product(
+          id: finalProductId,
+          name: _nameController.text,
+          description: _descriptionController.text,
+          price: double.parse(_priceController.text),
+          category: _categoryController.text,
+          stock: int.parse(_stockController.text),
+          imageUrls: imageUrls,
+          createdAt: tempProduct.createdAt,
+          updatedAt: DateTime.now(),
+        );
+
+        success = await productProvider.updateProduct(finalProductId, finalProduct);
       }
 
       if (success && mounted) {

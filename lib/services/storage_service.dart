@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path/path.dart' as path;
 
 class StorageService {
@@ -8,15 +9,62 @@ class StorageService {
   // Subir imagen de producto
   Future<String> uploadProductImage(File imageFile, String productId) async {
     try {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}_${path.basename(imageFile.path)}';
-      Reference ref = _storage.ref().child('products/$productId/$fileName');
+      // Validar que el archivo existe
+      if (!await imageFile.exists()) {
+        throw Exception('El archivo de imagen no existe');
+      }
+
+      // Validar que el productId no esté vacío
+      if (productId.isEmpty) {
+        throw Exception('ID de producto inválido');
+      }
+
+      // Verificar que el usuario esté autenticado
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('Usuario no autenticado');
+      }
+
+      String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      String fileExtension = path.extension(imageFile.path);
+      String baseName = path.basenameWithoutExtension(imageFile.path);
+      String fileName = '${productId}_${timestamp}_${baseName}$fileExtension';
+
+      // Validar que el nombre del archivo no esté vacío
+      if (fileName.isEmpty || fileName == '${productId}_${timestamp}_$fileExtension') {
+        fileName = '${productId}_${timestamp}_image$fileExtension';
+      }
+
+      print('Subiendo imagen: $fileName a ruta: products/$fileName');
+
+      Reference ref = _storage.ref().child('products/$fileName');
+
+      print('Referencia creada: ${ref.fullPath}');
+      print('Bucket: ${ref.bucket}');
 
       UploadTask uploadTask = ref.putFile(imageFile);
+      print('UploadTask creado, esperando completación...');
+
       TaskSnapshot snapshot = await uploadTask;
 
+      print('UploadTask completado con estado: ${snapshot.state}');
+      print('Bytes transferidos: ${snapshot.bytesTransferred}');
+      print('Total bytes: ${snapshot.totalBytes}');
+
+      // Verificar que la subida fue exitosa
+      if (snapshot.state != TaskState.success) {
+        throw Exception('La subida de la imagen falló con estado: ${snapshot.state}');
+      }
+
+      print('Imagen subida exitosamente, obteniendo URL...');
+
       String downloadUrl = await snapshot.ref.getDownloadURL();
+      print('URL obtenida exitosamente: $downloadUrl');
+
+      return downloadUrl;
       return downloadUrl;
     } catch (e) {
+      print('Error detallado al subir imagen: $e');
       throw Exception('Error al subir imagen: $e');
     }
   }
