@@ -113,83 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                         child: const Text('Gestionar Productos'),
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/stock-test');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                        ),
-                        child: const Text('🧪 Probar Sistema de Stock'),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text('Solicitudes de Vendedores Pendientes:'),
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('seller_requests')
-                            .where('status', isEqualTo: 'pending')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          }
-
-                          if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          }
-
-                          final requests = snapshot.data?.docs ?? [];
-
-                          if (requests.isEmpty) {
-                            return const Text('No hay solicitudes pendientes.');
-                          }
-
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: requests.length,
-                            itemBuilder: (context, index) {
-                              final request = requests[index];
-                              final requestData = request.data() as Map<String, dynamic>;
-                              final userId = requestData['userId'] as String;
-
-                              return FutureBuilder<DocumentSnapshot>(
-                                future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
-                                builder: (context, userSnapshot) {
-                                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                                    return const ListTile(title: Text('Cargando...'));
-                                  }
-
-                                  if (userSnapshot.hasError || !userSnapshot.hasData) {
-                                    return const ListTile(title: Text('Error al cargar usuario'));
-                                  }
-
-                                  final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-                                  final userName = userData['name'] ?? 'Desconocido';
-
-                                  return ListTile(
-                                    title: Text('Solicitud de: $userName'),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.check, color: Colors.green),
-                                          onPressed: () => _approveSellerRequest(context, request.id, userId),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.close, color: Colors.red),
-                                          onPressed: () => _rejectSellerRequest(context, request.id, userId),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
@@ -217,8 +140,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     switch (role) {
       case 'buyer':
         return 'Comprador';
-      case 'seller_pending':
-        return 'Vendedor (Pendiente)';
       case 'seller':
         return 'Vendedor';
       case 'admin':
@@ -302,58 +223,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
-
-  void _approveSellerRequest(BuildContext context, String requestId, String userId) async {
-    try {
-      // Actualizar solicitud a approved
-      await FirebaseFirestore.instance.collection('seller_requests').doc(requestId).update({
-        'status': 'approved',
-      });
-
-      // Actualizar rol del usuario a 'seller'
-      await FirebaseFirestore.instance.collection('users').doc(userId).update({
-        'role': 'seller',
-      });
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Solicitud aprobada.')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-  }
-
-  void _rejectSellerRequest(BuildContext context, String requestId, String userId) async {
-    try {
-      // Actualizar solicitud a rejected
-      await FirebaseFirestore.instance.collection('seller_requests').doc(requestId).update({
-        'status': 'rejected',
-      });
-
-      // Revertir rol del usuario a 'buyer'
-      await FirebaseFirestore.instance.collection('users').doc(userId).update({
-        'role': 'buyer',
-      });
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Solicitud rechazada.')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
   }
 
   void _assignAdminRole(BuildContext context) async {

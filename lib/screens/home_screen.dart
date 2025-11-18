@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../l10n/app_localizations.dart';
-import '../services/sample_data_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -105,33 +104,6 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
-            // Botón temporal para agregar datos de ejemplo
-            ElevatedButton(
-              onPressed: () async {
-                final sampleDataService = SampleDataService();
-                try {
-                  await sampleDataService.addSampleProducts();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Datos de ejemplo agregados exitosamente'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error agregando datos: $e'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: const Text('Agregar Productos de Ejemplo'),
-            ),
           ],
         ),
       ),

@@ -14,212 +14,71 @@ class AdminScreen extends StatefulWidget {
   State<AdminScreen> createState() => _AdminScreenState();
 }
 
-class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _AdminScreenState extends State<AdminScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+  final List<Widget> _screens = [
+    const ProductsTab(),
+    const UsersTab(),
+  ];
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  final List<String> _titles = [
+    'Productos',
+    'Usuarios',
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Panel de Administración'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Productos'),
-            Tab(text: 'Solicitudes'),
-            Tab(text: 'Usuarios'),
-          ],
-          labelColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
-          unselectedLabelColor: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withOpacity(0.7),
-          indicatorColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildProductsTab(),
-          _buildRequestsTab(),
-          _buildUsersTab(),
+        title: Text('Panel de Administración - ${_titles[_selectedIndex]}'),
+        actions: [
+          // Botones de navegación rápida
+          if (_selectedIndex != 0)
+            IconButton(
+              icon: const Icon(Icons.inventory),
+              onPressed: () => _onItemTapped(0),
+              tooltip: 'Productos',
+            ),
+          if (_selectedIndex != 1)
+            IconButton(
+              icon: const Icon(Icons.people),
+              onPressed: () => _onItemTapped(1),
+              tooltip: 'Usuarios',
+            ),
         ],
       ),
-      floatingActionButton: _tabController.index == 0
+      body: SizedBox.expand(
+        child: _screens[_selectedIndex],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory),
+            label: 'Productos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Usuarios',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).primaryColor,
+        onTap: _onItemTapped,
+      ),
+      floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () => _showAddProductDialog(context),
               child: const Icon(Icons.add),
               tooltip: 'Agregar Producto',
             )
           : null,
-    );
-  }
-
-  Widget _buildUsersTab() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text('Error: ${snapshot.error}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  child: const Text('Reintentar'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final users = snapshot.data?.docs ?? [];
-
-        if (users.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No hay usuarios registrados'),
-              ],
-            ),
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            final userDoc = users[index];
-            final userData = userDoc.data() as Map<String, dynamic>;
-            final userId = userDoc.id;
-            final name = userData['name'] ?? 'Sin nombre';
-            final email = userData['email'] ?? 'Sin email';
-            final role = userData['role'] ?? 'buyer';
-
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: Text(name.isNotEmpty ? name[0].toUpperCase() : '?'),
-                ),
-                title: Text(name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(email),
-                    Text(
-                      'Rol: ${_getRoleDisplayName(role)}',
-                      style: TextStyle(
-                        color: _getRoleColor(role),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                trailing: PopupMenuButton<String>(
-                  onSelected: (value) => _changeUserRole(context, userId, value, name),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'buyer',
-                      child: Text('Comprador'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'seller',
-                      child: Text('Vendedor'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'admin',
-                      child: Text('Administrador'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildProductsTab() {
-    return Consumer<ProductProvider>(
-      builder: (context, productProvider, child) {
-        if (productProvider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (productProvider.products.isEmpty) {
-          return const Center(
-            child: Text('No hay productos disponibles'),
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: productProvider.products.length,
-          itemBuilder: (context, index) {
-            final product = productProvider.products[index];
-            return Card(
-              child: ListTile(
-                leading: product.imageUrls.isNotEmpty
-                    ? Image.network(
-                        product.imageUrls.first,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.image_not_supported),
-                      )
-                    : const Icon(Icons.image_not_supported),
-                title: Text(product.name),
-                subtitle: Text('\$${product.price.toStringAsFixed(2)} - Stock: ${product.stock}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => _showEditProductDialog(context, product),
-                      tooltip: 'Editar',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _confirmDeleteProduct(context, product),
-                      tooltip: 'Eliminar',
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildRequestsTab() {
-    // Placeholder - implementar solicitudes de vendedor
-    return const Center(
-      child: Text('Funcionalidad de solicitudes próximamente'),
     );
   }
 
@@ -320,6 +179,385 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al cambiar rol: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+}
+
+// Widget separado para la pestaña de productos
+class ProductsTab extends StatefulWidget {
+  const ProductsTab({super.key});
+
+  @override
+  State<ProductsTab> createState() => _ProductsTabState();
+}
+
+class _ProductsTabState extends State<ProductsTab> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Consumer<ProductProvider>(
+        builder: (context, productProvider, child) {
+          if (productProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (productProvider.products.isEmpty) {
+            return const Center(
+              child: Text('No hay productos disponibles'),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: productProvider.products.length,
+            itemBuilder: (context, index) {
+              final product = productProvider.products[index];
+              return Card(
+                child: ListTile(
+                  leading: product.imageUrls.isNotEmpty
+                      ? Image.network(
+                          product.imageUrls.first,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.image_not_supported),
+                        )
+                      : const Icon(Icons.image_not_supported),
+                  title: Text(product.name),
+                  subtitle: Text('\$${product.price.toStringAsFixed(2)} - Stock: ${product.stock}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditProductDialog(context, product),
+                        tooltip: 'Editar',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _confirmDeleteProduct(context, product),
+                        tooltip: 'Eliminar',
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _showEditProductDialog(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      builder: (context) => ProductFormDialog(product: product),
+    );
+  }
+
+  void _confirmDeleteProduct(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Producto'),
+        content: Text('¿Estás seguro de que quieres eliminar "${product.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final productProvider = Provider.of<ProductProvider>(context, listen: false);
+              final success = await productProvider.deleteProduct(product.id);
+              if (success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Producto eliminado'), duration: Duration(seconds: 2)),
+                );
+              } else if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Error al eliminar producto'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Widget separado para la pestaña de usuarios
+class UsersTab extends StatefulWidget {
+  const UsersTab({super.key});
+
+  @override
+  State<UsersTab> createState() => _UsersTabState();
+}
+
+class _UsersTabState extends State<UsersTab> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Error: ${snapshot.error}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => setState(() {}),
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final users = snapshot.data?.docs ?? [];
+
+          if (users.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.people_outline, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No hay usuarios registrados'),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              final userDoc = users[index];
+              final userData = userDoc.data() as Map<String, dynamic>;
+              final userId = userDoc.id;
+              final name = userData['name'] ?? 'Sin nombre';
+              final email = userData['email'] ?? 'Sin email';
+              final role = userData['role'] ?? 'buyer';
+
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    child: Text(name.isNotEmpty ? name[0].toUpperCase() : '?'),
+                  ),
+                  title: Text(name),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(email),
+                      Text(
+                        'Rol: ${_getRoleDisplayName(role)}',
+                        style: TextStyle(
+                          color: _getRoleColor(role),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value.startsWith('role_')) {
+                        final newRole = value.substring(5); // Remove 'role_' prefix
+                        _changeUserRole(context, userId, newRole, name);
+                      } else if (value == 'block') {
+                        _toggleUserBlock(context, userId, name, userData['isBlocked'] == true);
+                      } else if (value == 'delete') {
+                        _confirmDeleteUser(context, userId, name);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'role_buyer',
+                        child: Text('👤 Cambiar a Comprador'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'role_seller',
+                        child: Text('🏪 Cambiar a Vendedor'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'role_admin',
+                        child: Text('⚡ Cambiar a Administrador'),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'block',
+                        child: Text(userData['isBlocked'] == true ? '🔓 Desbloquear Usuario' : '🔒 Bloquear Usuario'),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('🗑️ Eliminar Usuario', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  String _getRoleDisplayName(String role) {
+    switch (role) {
+      case 'buyer':
+        return 'Comprador';
+      case 'seller':
+        return 'Vendedor';
+      case 'admin':
+        return 'Administrador';
+      default:
+        return role;
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case 'buyer':
+        return Colors.blue;
+      case 'seller':
+        return Colors.green;
+      case 'admin':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _changeUserRole(BuildContext context, String userId, String newRole, String userName) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'role': newRole});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rol de $userName cambiado a ${_getRoleDisplayName(newRole)}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cambiar rol: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  void _toggleUserBlock(BuildContext context, String userId, String userName, bool isCurrentlyBlocked) async {
+    try {
+      final newBlockedStatus = !isCurrentlyBlocked;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'isBlocked': newBlockedStatus});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newBlockedStatus
+                ? '$userName ha sido bloqueado'
+                : '$userName ha sido desbloqueado'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al ${isCurrentlyBlocked ? 'desbloquear' : 'bloquear'} usuario: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  void _confirmDeleteUser(BuildContext context, String userId, String userName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Usuario'),
+        content: Text('¿Estás seguro de que quieres eliminar permanentemente al usuario "$userName"? Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _deleteUser(context, userId, userName);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteUser(BuildContext context, String userId, String userName) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .delete();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Usuario $userName eliminado permanentemente'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar usuario: $e'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),

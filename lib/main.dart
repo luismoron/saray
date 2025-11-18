@@ -15,7 +15,6 @@ import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/admin_screen.dart';
-import 'screens/stock_test_screen.dart';
 import 'screens/order_history_screen.dart';
 import 'themes/app_theme.dart';
 
@@ -68,10 +67,6 @@ class MyApp extends StatelessWidget {
           '/admin': (context) => const RouteGuard(
                 requiredRole: 'admin',
                 child: const AdminScreen(),
-              ),
-          '/stock-test': (context) => const RouteGuard(
-                requiredRole: 'admin',
-                child: const StockTestScreen(),
               ),
           '/order-history': (context) => const OrderHistoryScreen(),
         },
