@@ -42,7 +42,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - **Sistema de Roles**: Compradores por defecto, solicitud para ser vendedor con aprobación admin.
 - Permisos configurados para Android e iOS.
 
-## Avances Recientes (17 de noviembre de 2025)
+## Avances Recientes (18 de noviembre de 2025)
 
 - Completado modelo Category.
 - Configurados permisos en AndroidManifest.xml e Info.plist.
@@ -55,22 +55,34 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - Sistema de roles funcional con asignación temporal de admin.
   - Interfaz de administración con tabs para productos y solicitudes.
   - Validaciones y manejo de errores en formularios.
+- **Historial de Pedidos completamente funcional**:
+  - Pantalla dedicada con filtros por estado y búsqueda por ID.
+  - Vista detallada de pedidos con productos e imágenes.
+  - Solución de problemas de índices de Firestore mediante procesamiento en cliente.
+  - Manejo robusto de errores con try-catch y validaciones.
+- **Mejoras de estabilidad**:
+  - Manejo de errores en construcción de UI.
+  - Validaciones de datos nulos.
+  - Logging detallado para debugging.
 
-## Estado de Pruebas (17 de noviembre de 2025)
+## Estado de Pruebas (18 de noviembre de 2025)
 
 - ✅ **Autenticación**: Registro, login, logout probados exitosamente.
 - ✅ **Panel de Administración**: Asignación de rol admin, gestión de productos con imágenes.
+- ✅ **Historial de Pedidos**: Navegación, filtros, búsqueda y detalles probados.
 - ✅ **Compilación**: App compila sin errores en Android.
-- 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas.
+- ✅ **Manejo de Errores**: Try-catch implementado en componentes críticos.
+- 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.
 - 🔄 **Notificaciones**: Pendiente implementación.
 
 ## Próximos Pasos
 
-- Realizar pruebas exhaustivas del carrito de compras y proceso de checkout.
+- Realizar pruebas exhaustivas finales del carrito de compras y proceso de checkout.
 - Implementar notificaciones push con Firebase Cloud Messaging.
 - Mejorar UI/UX: agregar iconos, optimizar responsive design.
 - Optimizar rendimiento: lazy loading, caching de imágenes.
 - Implementar sistema de reseñas y calificaciones de productos.
 - Agregar funcionalidad de búsqueda avanzada y filtros adicionales.
+- **PENDIENTE**: Resolver dependencias de paquetes obsoletos (Firebase packages necesitan actualización).
 
 Para más detalles, consulta `logic.md` para lógica implementada, `rules.md` para reglas del proyecto, y `tasks.md` para la lista completa de tareas.

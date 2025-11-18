@@ -17,6 +17,46 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/cart');
+                    },
+                  ),
+                  if (cartProvider.hasItems)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${cartProvider.cartItems.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -75,7 +115,7 @@ class HomeScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Datos de ejemplo agregados exitosamente'),
-                        duration: Duration(seconds: 3),
+                        duration: Duration(seconds: 2),
                       ),
                     );
                   }
@@ -84,7 +124,7 @@ class HomeScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error agregando datos: $e'),
-                        duration: const Duration(seconds: 4),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   }

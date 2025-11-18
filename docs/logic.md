@@ -98,6 +98,26 @@ Aquí se documentará toda la lógica implementada, decisiones tomadas y pasos r
   - Mejor organización del código con responsabilidades bien definidas.
   - UI/UX mejorada con navegación intuitiva y filtros funcionales.
 
+### Fecha: 18 de noviembre de 2025 (Solución de Índices Firestore)
+
+- **Problema de Índices de Firestore Resuelto**:
+  - Identificado error "The query requires an index" en consultas compuestas (userId + createdAt + status).
+  - Solución implementada: Simplificar consultas Firestore eliminando orderBy del servidor.
+  - Nuevo enfoque: Filtrar solo por userId en Firestore, ordenar y filtrar adicionalmente en cliente.
+  - Ventajas: Elimina dependencia de índices compuestos, funciona inmediatamente, mejor rendimiento para pocos pedidos.
+  - Desventajas: Menos eficiente para miles de pedidos (no aplicable en desarrollo actual).
+
+- **Mejoras de Manejo de Errores**:
+  - Agregado try-catch en construcción de tarjetas de pedido con fallback a tarjeta de error.
+  - Agregado try-catch en vista detallada de pedidos con SnackBars informativos.
+  - Validaciones de nombres de productos nulos para evitar crashes.
+  - Logging detallado de errores para debugging futuro.
+
+- **Optimización de Consultas**:
+  - Eliminadas consultas complejas que requerían índices compuestos.
+  - Procesamiento híbrido: servidor para filtrado básico, cliente para ordenamiento y filtros avanzados.
+  - Mejor UX: filtros funcionan sin delays de creación de índices.
+
 - **Pruebas del Panel de Administración Realizadas**:
   - Asignación exitosa de rol admin mediante botón temporal en perfil.
   - Acceso al panel de administración desde perfil de usuario admin.

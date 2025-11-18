@@ -155,14 +155,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               final success = await productProvider.deleteProduct(product.id);
               if (success && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Producto eliminado'), duration: Duration(seconds: 3)),
+                  const SnackBar(content: Text('Producto eliminado'), duration: Duration(seconds: 2)),
                 );
               } else if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Error al eliminar producto'),
                     backgroundColor: Colors.red,
-                    duration: Duration(seconds: 3),
+                    duration: Duration(seconds: 2),
                   ),
                 );
               }
@@ -396,7 +396,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
             content: Text(widget.product != null
                 ? 'Producto actualizado'
                 : 'Producto agregado'),
-            duration: Duration(seconds: 3),
+            duration: Duration(seconds: 2),
           ),
         );
       } else if (mounted) {
@@ -404,7 +404,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           const SnackBar(
             content: Text('Error al guardar producto'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
+            duration: Duration(seconds: 2),
           ),
         );
       }
@@ -414,7 +414,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           SnackBar(
             content: Text('Error: $e'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
+            duration: Duration(seconds: 2),
           ),
         );
       }

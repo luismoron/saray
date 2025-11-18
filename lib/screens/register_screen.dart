@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(errorMessage),
-                                  duration: const Duration(seconds: 4),
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                             }

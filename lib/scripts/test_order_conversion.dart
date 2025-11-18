@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/order.dart';
+import '../models/order.dart' as order_model;
 import '../models/cart_item.dart';
 import '../models/product.dart';
 
@@ -36,7 +36,7 @@ void testOrderConversion() async {
 
   try {
     print('Testing Order.fromFirestore...');
-    final order = Order.fromFirestore(mockOrderData, 'test-order-id');
+    final order = order_model.Order.fromFirestore(mockOrderData, 'test-order-id');
     print('SUCCESS: Order created successfully');
     print('Order ID: ${order.id}');
     print('Order Status: ${order.status}');

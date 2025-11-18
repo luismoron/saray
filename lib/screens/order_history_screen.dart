@@ -145,13 +145,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   }
                 }).where((order) => order != null).cast<my_order.Order>().toList() ?? [];
 
+                // Ordenar por fecha de creación (descendente) en cliente
+                orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
                 // Filtrar por búsqueda si hay texto
                 final filteredOrders = _searchController.text.isNotEmpty
                     ? orders.where((order) =>
                         order.id.toLowerCase().contains(_searchController.text.toLowerCase())).toList()
                     : orders;
 
-                if (filteredOrders.isEmpty) {
+                // Aplicar filtro de estado en cliente si no es 'all'
+                final finalFilteredOrders = _selectedStatus != 'all'
+                    ? filteredOrders.where((order) =>
+                        order.status.toString().split('.').last == _selectedStatus).toList()
+                    : filteredOrders;
+
+                if (finalFilteredOrders.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -185,10 +194,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: filteredOrders.length,
+                  itemCount: finalFilteredOrders.length,
                   itemBuilder: (context, index) {
-                    final order = filteredOrders[index];
-                    return _buildOrderCard(context, order);
+                    final order = finalFilteredOrders[index];
+                    try {
+                      return _buildOrderCard(context, order);
+                    } catch (e, stackTrace) {
+                      print('ERROR: Failed to build order card for ${order.id}: $e');
+                      print('ERROR: Stack trace: $stackTrace');
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text('Error al mostrar pedido ${order.id.substring(0, 8).toUpperCase()}'),
+                        ),
+                      );
+                    }
                   },
                 );
               },
@@ -200,15 +221,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Query _buildOrdersQuery(String userId) {
+    // Simplificar la consulta para evitar problemas de índices
+    // Obtener todos los pedidos del usuario y filtrar/ordenar en cliente
     Query query = FirebaseFirestore.instance
         .collection('orders')
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true);
-
-    // Aplicar filtro de estado si no es 'all'
-    if (_selectedStatus != 'all') {
-      query = query.where('status', isEqualTo: _selectedStatus);
-    }
+        .where('userId', isEqualTo: userId);
 
     return query;
   }
@@ -356,7 +373,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   void _showOrderDetails(BuildContext context, my_order.Order order) {
-    showModalBottomSheet(
+    try {
+      showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -449,7 +467,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item.product.name,
+                                    item.product.name.isNotEmpty ? item.product.name : 'Producto sin nombre',
                                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -471,7 +489,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ],
                         ),
                       ),
-                    )),
+                    )).toList(),
                   ],
                 ),
               ),
@@ -480,6 +498,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ),
       ),
     );
+    } catch (e, stackTrace) {
+      print('ERROR: Failed to show order details for ${order.id}: $e');
+      print('ERROR: Stack trace: $stackTrace');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al mostrar detalles del pedido: $e')),
+      );
+    }
   }
 
   Widget _buildDetailRow(String label, String value) {

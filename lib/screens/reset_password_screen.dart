@@ -75,7 +75,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Error sending reset email. Please try again.'),
-                              duration: Duration(seconds: 4),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         }

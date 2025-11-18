@@ -188,10 +188,11 @@ class ProductCard extends StatelessWidget {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
     if (authProvider.user == null) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Ocultar cualquier notificación actual
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Debes iniciar sesión para agregar productos al carrito'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -223,10 +224,11 @@ class ProductCard extends StatelessWidget {
         final cartProvider = Provider.of<CartProvider>(context, listen: false);
         final scaffoldMessenger = ScaffoldMessenger.of(context);
 
+        scaffoldMessenger.hideCurrentSnackBar(); // Ocultar cualquier notificación actual
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('${product.name} agregado al carrito'),
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 2),
             action: cartProvider.hasItems ? SnackBarAction(
               label: 'Ver Carrito',
               onPressed: () {
@@ -237,6 +239,7 @@ class ProductCard extends StatelessWidget {
           ),
         );
       } else {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Ocultar cualquier notificación actual
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Error al agregar el producto al carrito. Inténtalo de nuevo.'),
@@ -247,11 +250,12 @@ class ProductCard extends StatelessWidget {
       }
     } catch (e) {
       print('Error adding to cart: $e');
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Ocultar cualquier notificación actual
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al agregar el producto al carrito. Inténtalo de nuevo.'),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
     }

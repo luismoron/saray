@@ -60,6 +60,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Búsqueda por ID de pedido.
   - [x] Vista detallada de cada pedido con productos, precios y estado.
   - [x] Navegación desde el perfil de usuario.
+  - [x] Solución de problemas de índices de Firestore (procesamiento en cliente).
 - [x] **Sistema de Roles de Usuario**:
   - [x] Implementar roles: buyer (comprador), seller_pending, seller (aprobado), admin.
   - [x] Solicitud de vendedor con aprobación admin.
@@ -68,6 +69,11 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Pantalla de admin con tabs para productos y solicitudes.
   - [x] Gestión completa de productos: agregar, editar, eliminar con imágenes.
   - [x] Integración con Firebase Storage para subir imágenes de productos.
+- [x] **Manejo de Errores y Robustez**:
+  - [x] Try-catch en construcción de tarjetas de pedido.
+  - [x] Try-catch en detalles de pedido con SnackBars informativos.
+  - [x] Validaciones de datos nulos en productos y pedidos.
+  - [x] Solución de problemas de índices de Firestore.
 
 ## 4. Diseño de UI/UX
 
@@ -137,10 +143,10 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Verificar notificaciones al modificar/remover del carrito.
   - [x] Verificar notificaciones de error.
   - [x] Verificar que las notificaciones se oculten automáticamente.
-- [ ] **Pruebas de Integración**:
-  - [ ] Flujo completo: Login → Catálogo → Carrito → Checkout → Confirmación.
-  - [ ] Verificar manejo de errores de red.
-  - [ ] Verificar comportamiento offline/online.
+- [x] **Pruebas de Integración**:
+  - [x] Flujo completo: Login → Catálogo → Carrito → Checkout → Confirmación.
+  - [x] Verificar manejo de errores de red.
+  - [x] Verificar comportamiento offline/online.
 - [x] **Pruebas del Panel de Administración**:
   - [x] Asignar rol admin a usuario existente.
   - [x] Acceder al panel de administración desde perfil.
@@ -150,5 +156,12 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Eliminar producto con confirmación.
   - [x] Verificar subida de imágenes a Firebase Storage.
   - [x] Verificar actualización en tiempo real del catálogo.
+- [x] **Pruebas del Historial de Pedidos**:
+  - [x] Acceder al historial desde el perfil de usuario.
+  - [x] Ver lista de pedidos existentes.
+  - [x] Probar filtros por estado de pedido.
+  - [x] Probar búsqueda por ID de pedido.
+  - [x] Ver detalles completos de un pedido.
+  - [x] Verificar manejo de errores sin índices de Firestore.
 
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?
