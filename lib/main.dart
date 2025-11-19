@@ -16,7 +16,10 @@ import 'screens/checkout_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/admin_screen.dart';
 import 'screens/order_history_screen.dart';
+import 'screens/notification_center_screen.dart';
 import 'themes/app_theme.dart';
+import 'services/notification_service.dart';
+import 'services/enhanced_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +27,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Inicializar servicio de notificaciones
+    await NotificationService().initialize();
     // Temporalmente deshabilitado para pruebas
     // await FirebaseAppCheck.instance.activate(
     //   androidProvider: AndroidProvider.debug,
@@ -48,6 +53,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Bazar de Saray',
+        scaffoldMessengerKey: EnhancedNotificationService().scaffoldMessengerKey,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
@@ -69,6 +75,7 @@ class MyApp extends StatelessWidget {
                 child: const AdminScreen(),
               ),
           '/order-history': (context) => const OrderHistoryScreen(),
+          '/notifications': (context) => const NotificationCenter(),
         },
       ),
     );

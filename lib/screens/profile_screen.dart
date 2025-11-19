@@ -93,6 +93,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
+            // Centro de notificaciones
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.notifications, color: Colors.blue),
+                title: const Text('Centro de Notificaciones'),
+                subtitle: const Text('Ver todas tus notificaciones'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/notifications');
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Panel de admin (solo si es admin)
             if (user.role == 'admin') ...[
               const SizedBox(height: 24),
@@ -107,16 +121,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/admin');
-                        },
-                        child: const Text('Gestionar Productos'),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/admin');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('Gestionar Productos'),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
+              const SizedBox(height: 32), // Espacio extra al final
             ],
           ],
         ),

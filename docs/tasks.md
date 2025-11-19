@@ -50,7 +50,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [x] **Proceso de Compra**:
   - [x] Pantalla de checkout: confirmar dirección, método de pago (implementado con pago contra entrega).
   - [x] Crear pedido en Firestore y actualizar stock.
-  - [ ] Notificaciones push (usar Firebase Cloud Messaging) para confirmaciones.
+  - [x] Notificaciones push (usar Firebase Cloud Messaging) para confirmaciones.
 - [x] **Perfil de Usuario**:
   - [x] Ver/editar datos personales, historial de pedidos.
   - [x] Para admins: panel para agregar/editar productos.
@@ -68,9 +68,12 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Protección de rutas con RouteGuard para acceso basado en roles.
   - [x] Buyers solo pueden comprar, admins controlan permisos de venta.
 - [x] **Panel de Administración**:
-  - [x] Pantalla de admin con tabs para productos y solicitudes.
+  - [x] Pantalla de admin con tabs para productos y usuarios.
   - [x] Gestión completa de productos: agregar, editar, eliminar con imágenes.
+  - [x] Gestión completa de usuarios: cambiar roles, bloquear/desbloquear, eliminar usuarios.
   - [x] Integración con Firebase Storage para subir imágenes de productos.
+  - [x] Layout optimizado que utiliza todo el espacio disponible.
+  - [x] Eliminación de funcionalidades de desarrollo/testing (stock testing, sample products, requests section).
 - [x] **Manejo de Errores y Robustez**:
   - [x] Try-catch en construcción de tarjetas de pedido.
   - [x] Try-catch en detalles de pedido con SnackBars informativos.
@@ -93,7 +96,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 ## 5. Integraciones y Herramientas Adicionales
 
 - [x] **Firebase Storage**: Para subir y servir imágenes de productos.
-- [ ] **Firebase Cloud Messaging**: Notificaciones para ofertas o actualizaciones de pedidos.
+- [x] **Firebase Cloud Messaging**: Notificaciones para ofertas o actualizaciones de pedidos.
 - [ ] **Analytics**: Firebase Analytics para rastrear uso de la app (compras, búsquedas).
 - [ ] **Opcionales Avanzados**: Integrar Google Maps para direcciones de entrega, o Stripe para pagos reales.
 - [ ] **Pruebas**: Crear tests unitarios (test/) para modelos y servicios. Usar Firebase Emulator Suite para pruebas locales.
@@ -106,17 +109,17 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 - [ ] **Accesibilidad**: Asegurar que la UI sea accesible (contraste, tamaños de fuente).
 - [ ] **Optimización de Rendimiento**: Lazy loading en listas, caching de imágenes.
 - [ ] **Sistema de Notificaciones Mejorado**:
-  - [ ] Implementar notificaciones push con Firebase Cloud Messaging para ofertas y actualizaciones de pedidos.
-  - [ ] Mejorar el sistema de SnackBars/notificaciones locales:
-    - [ ] Agregar animaciones personalizadas para las notificaciones.
-    - [ ] Implementar notificaciones tipo "toast" más elegantes.
-    - [ ] Agregar sonidos opcionales para notificaciones importantes.
-    - [ ] Crear un sistema de notificaciones persistentes para mensajes críticos (errores de red, etc.).
-    - [ ] Implementar notificaciones contextuales que cambien según el estado de la app (modo offline, carrito lleno, etc.).
-    - [ ] Agregar opción de "no molestar" o silenciar notificaciones por tiempo determinado.
-  - [ ] Sistema de notificaciones in-app:
-    - [ ] Centro de notificaciones para ver historial de mensajes.
-    - [ ] Badges/notificaciones en el ícono de la app para notificaciones no leídas.
+  - [x] Implementar notificaciones push con Firebase Cloud Messaging para ofertas y actualizaciones de pedidos.
+  - [x] Mejorar el sistema de SnackBars/notificaciones locales:
+    - [x] Agregar animaciones personalizadas para las notificaciones.
+    - [x] Implementar notificaciones tipo "toast" más elegantes.
+    - [x] Agregar sonidos opcionales para notificaciones importantes.
+    - [x] Crear un sistema de notificaciones persistentes para mensajes críticos (errores de red, etc.).
+    - [x] Implementar notificaciones contextuales que cambien según el estado de la app (modo offline, carrito lleno, etc.).
+    - [x] Agregar opción de "no molestar" o silenciar notificaciones por tiempo determinado.
+  - [x] Sistema de notificaciones in-app:
+    - [x] Centro de notificaciones para ver historial de mensajes.
+    - [x] Badges/notificaciones en el ícono de la app para notificaciones no leídas.
     - [ ] Notificaciones de productos relacionados o recomendaciones.
     - [ ] Recordatorios para completar compras abandonadas.
 

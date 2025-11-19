@@ -4,6 +4,8 @@ import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../models/order.dart' as order_model;
 import '../services/order_service.dart';
+import '../services/enhanced_notification_service.dart';
+import '../services/notification_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -323,11 +325,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Debes iniciar sesión para realizar un pedido'),
-          duration: Duration(seconds: 3),
-        ),
+      EnhancedNotificationService().showErrorNotification(
+        message: 'Debes iniciar sesión para realizar un pedido',
       );
       return;
     }
@@ -358,38 +357,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // Limpiar el carrito
         await cartProvider.clearCart();
 
-        // Mostrar confirmación y navegar
+        // Mostrar confirmación mejorada y navegar
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('¡Pedido confirmado! ID: $orderId'),
-              duration: const Duration(seconds: 4),
-            ),
+          EnhancedNotificationService().showOrderConfirmation(
+            orderId: orderId,
+            total: cartProvider.total,
+            onViewOrder: () {
+              // TODO: Navegar a detalles del pedido cuando se implemente
+              Navigator.of(context).pushNamed('/order-history');
+            },
           );
+
+          // Enviar notificación push
+          await NotificationService().showOrderConfirmationNotification(orderId, cartProvider.total);
 
           // Navegar de vuelta al home
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error al crear el pedido. Inténtalo de nuevo.'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 4),
-            ),
+          EnhancedNotificationService().showErrorNotification(
+            message: 'Error al crear el pedido. Inténtalo de nuevo.',
           );
         }
       }
     } catch (e) {
       print('Error creating order: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error al procesar el pedido. Inténtalo de nuevo.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 4),
-          ),
+        EnhancedNotificationService().showErrorNotification(
+          message: 'Error al procesar el pedido. Inténtalo de nuevo.',
         );
       }
     } finally {
