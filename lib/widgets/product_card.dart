@@ -105,75 +105,72 @@ class ProductCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Nombre (expandido)
+                        // Nombre y descripción como párrafo continuo
                         Expanded(
-                          child: Text(
-                            product.name,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              height: 1.1,
-                            ),
-                            maxLines: 2,
+                          child: RichText(
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              children: [
+                                // Nombre en negrita
+                                TextSpan(
+                                  text: product.name,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.onSurface,
+                                    height: 1.1,
+                                  ),
+                                ),
+                                // Espacio entre nombre y descripción
+                                const TextSpan(text: ' '),
+                                // Descripción normal
+                                TextSpan(
+                                  text: product.description,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    height: 1.1,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
                         const SizedBox(width: 12),
 
-                        // Precio y stock en columna
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // Precio
-                            Text(
-                              '\$${product.price.toStringAsFixed(2)}',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            // Stock debajo del precio
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: product.stock > 0
-                                    ? theme.colorScheme.surfaceContainerHighest
-                                    : theme.colorScheme.errorContainer,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                '${l10n.stock}: ${product.stock}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: product.stock > 0
-                                      ? theme.colorScheme.onSurfaceVariant
-                                      : theme.colorScheme.onErrorContainer,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
+                        // Precio y stock en párrafo continuo
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 120),
+                          child: RichText(
+                            textAlign: TextAlign.right,
+                            text: TextSpan(
+                              children: [
+                                // Precio
+                                TextSpan(
+                                  text: '\$${product.price.toStringAsFixed(2)}',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
+                                // Espacio
+                                const TextSpan(text: ' • '),
+                                // Stock
+                                TextSpan(
+                                  text: '${l10n.stock}: ${product.stock}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: product.stock > 0
+                                        ? theme.colorScheme.onSurfaceVariant
+                                        : theme.colorScheme.error,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ],
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Descripción
-                    Text(
-                      product.description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
 
                     const SizedBox(height: 8),
