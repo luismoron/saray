@@ -77,6 +77,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - Optimización de tarjetas de productos con layout continuo.
   - Eliminación de sombras innecesarias.
   - RichText para mejor presentación de nombres y descripciones.
+  - **Tarjetas del carrito optimizadas** con el mismo estilo compacto que el catálogo.
 - **Mejoras de estabilidad**:
   - Manejo de errores en construcción de UI.
   - Validaciones de datos nulos.
@@ -93,7 +94,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - ✅ **Cambio de Nombre**: Nombre del proyecto actualizado a "Saray" en toda la aplicación.
 - ✅ **Compilación**: App compila sin errores en Android.
 - ✅ **Manejo de Errores**: Try-catch implementado en componentes críticos.
-- 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.
+- ✅ **Carrito y Checkout**: Tarjetas compactas como catálogo implementadas, pendientes pruebas exhaustivas finales.
 - 🔄 **Notificaciones**: Pendiente implementación.
 
 ## Roadmap de Mejoras Futuras
