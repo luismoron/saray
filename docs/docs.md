@@ -69,6 +69,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - UpdateProvider para gestión de estado.
   - Script deploy.bat optimizado para distribución a testers.
   - Documentación completa en UPDATE_SETUP.md.
+- **Cambio de nombre del proyecto**: De "Bazar de Saray" a simplemente "Saray" en toda la aplicación y documentación.
 - **Mejoras de UI/UX en productos**:
   - Optimización de tarjetas de productos con layout continuo.
   - Eliminación de sombras innecesarias.
@@ -86,6 +87,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - ✅ **Historial de Pedidos**: Navegación, filtros, búsqueda y detalles probados.
 - ✅ **Sistema OTA**: Verificación de actualizaciones, descarga e instalación automática probadas.
 - ✅ **Script Deploy**: `deploy.bat` probado y funcionando correctamente.
+- ✅ **Cambio de Nombre**: Nombre del proyecto actualizado a "Saray" en toda la aplicación.
 - ✅ **Compilación**: App compila sin errores en Android.
 - ✅ **Manejo de Errores**: Try-catch implementado en componentes críticos.
 - 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.

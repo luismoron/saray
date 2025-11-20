@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text('${l10n.welcome}, ${authProvider.user?.name ?? 'User'}!'),
             const SizedBox(height: 20),
-            const Text('This is the home screen of Bazar de Saray.'),
+            const Text('This is the home screen of Saray.'),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
