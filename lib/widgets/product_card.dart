@@ -101,10 +101,11 @@ class ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Nombre y precio en fila superior
+                    // Nombre y precio/stock en columna derecha
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Nombre (expandido)
                         Expanded(
                           child: Text(
                             product.name,
@@ -116,18 +117,53 @@ class ProductCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+
+                        const SizedBox(width: 12),
+
+                        // Precio y stock en columna
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Precio
+                            Text(
+                              '\$${product.price.toStringAsFixed(2)}',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            // Stock debajo del precio
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: product.stock > 0
+                                    ? theme.colorScheme.surfaceContainerHighest
+                                    : theme.colorScheme.errorContainer,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${l10n.stock}: ${product.stock}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: product.stock > 0
+                                      ? theme.colorScheme.onSurfaceVariant
+                                      : theme.colorScheme.onErrorContainer,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
 
                     // Descripción
                     Text(
@@ -138,32 +174,6 @@ class ProductCard extends StatelessWidget {
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Stock
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: product.stock > 0
-                            ? theme.colorScheme.surfaceContainerHighest
-                            : theme.colorScheme.errorContainer,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${l10n.stock}: ${product.stock}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: product.stock > 0
-                              ? theme.colorScheme.onSurfaceVariant
-                              : theme.colorScheme.onErrorContainer,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11,
-                        ),
-                      ),
                     ),
 
                     const SizedBox(height: 8),
