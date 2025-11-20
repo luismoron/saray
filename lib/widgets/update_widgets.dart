@@ -15,18 +15,25 @@ class UpdateProvider extends ChangeNotifier {
 
   /// Verifica si hay actualizaciones disponibles
   Future<void> checkForUpdates() async {
+    debugPrint('🔍 UpdateProvider: Iniciando verificación de actualizaciones...');
     _isChecking = true;
     notifyListeners();
 
     try {
       _updateInfo = await _updateService.checkForUpdate();
+      debugPrint('🔍 UpdateProvider: Resultado de checkForUpdate: $_updateInfo');
+      if (_updateInfo != null) {
+        debugPrint('✅ UpdateProvider: ¡Actualización disponible! Versión: ${_updateInfo!.latestVersion}');
+      } else {
+        debugPrint('ℹ️ UpdateProvider: No hay actualizaciones disponibles');
+      }
     } finally {
       _isChecking = false;
       notifyListeners();
     }
   }
 
-  /// Descarga el APK sin instalarlo automáticamente
+  /// Descarga e instala automáticamente el APK
   Future<String?> downloadUpdate() async {
     if (_updateInfo == null) return null;
 
@@ -34,7 +41,7 @@ class UpdateProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final apkPath = await _updateService.downloadApkOnly(_updateInfo!);
+      final apkPath = await _updateService.downloadAndInstallUpdate(_updateInfo!);
       if (apkPath != null) {
         // Actualizar la información con la ruta del APK descargado
         _updateInfo = UpdateInfo(
@@ -110,9 +117,9 @@ class UpdateNotificationBanner extends StatelessWidget {
                       final apkPath = await updateProvider.downloadUpdate();
                       if (apkPath != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('APK descargado en: $apkPath'),
-                            duration: Duration(seconds: 5),
+                          const SnackBar(
+                            content: Text('Descargando e instalando actualización...'),
+                            duration: Duration(seconds: 3),
                           ),
                         );
                       }
@@ -123,7 +130,7 @@ class UpdateNotificationBanner extends StatelessWidget {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Descargar'),
+                  : const Text('Instalar'),
               ),
             ],
           ),
@@ -199,9 +206,9 @@ class UpdateDialog extends StatelessWidget {
                     final apkPath = await updateProvider.downloadUpdate();
                     if (apkPath != null && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('APK descargado. Instálalo manualmente desde tus descargas.'),
-                          duration: Duration(seconds: 5),
+                        const SnackBar(
+                          content: Text('Descargando e instalando actualización...'),
+                          duration: Duration(seconds: 3),
                         ),
                       );
                     }
@@ -212,7 +219,7 @@ class UpdateDialog extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Descargar APK'),
+                : const Text('Instalar Actualización'),
             ),
           ],
         );

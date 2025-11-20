@@ -67,6 +67,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - Banner de notificación integrado en pantalla principal.
   - **Botón de descarga contextual** en AppBar (solo visible cuando hay actualización disponible).
   - Diálogo detallado con notas de versión.
+  - **Lectura de version.json desde assets** del APK.
   - **Descarga manual del APK** (usuario decide cuándo instalar).
   - Servicio UpdateService con verificación desde Google Drive.
   - UpdateProvider para gestión de estado.

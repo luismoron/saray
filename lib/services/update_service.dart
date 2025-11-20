@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 /// Información de actualización disponible
 class UpdateInfo {
@@ -73,7 +74,10 @@ class UpdateService {
       debugPrint('🔍 UpdateService: Release notes: ${versionInfo['release_notes']}');
 
       // Comparar versiones
-      if (_isNewerVersion(latestVersion, currentVersion)) {
+      final isNewer = _isNewerVersion(latestVersion, currentVersion);
+      debugPrint('🔍 UpdateService: Comparando versiones - Latest: $latestVersion, Current: $currentVersion, IsNewer: $isNewer');
+
+      if (isNewer) {
         debugPrint('✅ UpdateService: ¡Nueva versión detectada!');
         return UpdateInfo(
           currentVersion: currentVersion,
@@ -189,42 +193,22 @@ class UpdateService {
     }
   }
 
-  /// Obtiene información de versión desde Google Drive
+  /// Obtiene información de versión desde assets
   Future<Map<String, dynamic>?> _getVersionInfo() async {
     try {
-      // TEMPORAL: Usar archivo local para pruebas
-      debugPrint('🔍 _getVersionInfo: Leyendo archivo local version.json');
-      final file = File('version.json');
-      if (await file.exists()) {
-        final content = await file.readAsString();
-        final data = json.decode(content) as Map<String, dynamic>;
-        debugPrint('✅ _getVersionInfo: Datos obtenidos del archivo local: $data');
-        return data;
-      } else {
-        debugPrint('❌ _getVersionInfo: Archivo version.json no encontrado');
-        return null;
-      }
+      debugPrint('🔍 _getVersionInfo: Leyendo version.json desde assets');
 
-      /*
-      // Código original para Google Drive
-      final response = await _dio.get(_versionInfoUrl);
+      // Leer el archivo desde assets
+      final content = await rootBundle.loadString('version.json');
+      debugPrint('🔍 _getVersionInfo: Contenido del archivo: $content');
 
-      if (response.statusCode == 200) {
-        // Si es un archivo JSON directo
-        if (response.data is Map<String, dynamic>) {
-          return response.data as Map<String, dynamic>;
-        }
-
-        // Si es un string JSON, parsearlo
-        if (response.data is String) {
-          return json.decode(response.data as String) as Map<String, dynamic>;
-        }
-      }
-      */
+      final data = json.decode(content) as Map<String, dynamic>;
+      debugPrint('✅ _getVersionInfo: Datos obtenidos desde assets: $data');
+      return data;
     } catch (e) {
-      debugPrint('❌ _getVersionInfo: Error: $e');
+      debugPrint('❌ _getVersionInfo: Error al leer desde assets: $e');
+      return null;
     }
-    return null;
   }
 
   /// Compara versiones para determinar si la nueva es más reciente
