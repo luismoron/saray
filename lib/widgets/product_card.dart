@@ -138,7 +138,7 @@ class ProductCard extends StatelessWidget {
 
                         const SizedBox(width: 12),
 
-                        // Precio y stock en párrafo continuo
+                        // Precio y stock como párrafo continuo vertical
                         Container(
                           constraints: const BoxConstraints(maxWidth: 120),
                           child: RichText(
@@ -147,15 +147,14 @@ class ProductCard extends StatelessWidget {
                               children: [
                                 // Precio
                                 TextSpan(
-                                  text: '\$${product.price.toStringAsFixed(2)}',
+                                  text: '\$${product.price.toStringAsFixed(2)}\n',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     color: theme.colorScheme.primary,
                                     fontWeight: FontWeight.bold,
+                                    height: 1.1,
                                   ),
                                 ),
-                                // Espacio
-                                const TextSpan(text: ' • '),
-                                // Stock
+                                // Stock en línea siguiente
                                 TextSpan(
                                   text: '${l10n.stock}: ${product.stock}',
                                   style: theme.textTheme.bodySmall?.copyWith(
@@ -164,6 +163,7 @@ class ProductCard extends StatelessWidget {
                                         : theme.colorScheme.error,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 11,
+                                    height: 1.1,
                                   ),
                                 ),
                               ],
