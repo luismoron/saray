@@ -82,7 +82,16 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Corregir uso de BuildContext en gaps asíncronos.
   - [x] Reemplazar print con debugPrint para logging seguro.
 
-## 4. Diseño de UI/UX
+## 4. Mantenimiento y Actualizaciones
+
+- [x] **Sistema de Actualizaciones OTA (Over-The-Air)**:
+  - [x] Implementar `UpdateService` para verificar versiones desde Google Drive.
+  - [x] Configurar `version.json` remoto.
+  - [x] Implementar lógica de descarga robusta (bypass de advertencia de virus de Drive).
+  - [x] Configurar `FileProvider` y permisos de instalación en Android.
+  - [x] Crear UI (`UpdateNotificationBanner`) para notificar al usuario.
+
+## 5. Diseño de UI/UX
 
 - [x] **Tema y Estilos**:
   - [x] Usar Material Design para consistencia.

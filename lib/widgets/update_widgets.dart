@@ -1,82 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:saray/services/update_service.dart';
-
-/// Provider para manejar el estado de las actualizaciones
-class UpdateProvider extends ChangeNotifier {
-  final UpdateService _updateService = UpdateService();
-  UpdateInfo? _updateInfo;
-  bool _isChecking = false;
-  bool _isDownloading = false;
-  String? _lastErrorMessage;
-
-  UpdateInfo? get updateInfo => _updateInfo;
-  bool get isChecking => _isChecking;
-  bool get isDownloading => _isDownloading;
-  String? get lastErrorMessage => _lastErrorMessage;
-
-  /// Verifica si hay actualizaciones disponibles
-  Future<void> checkForUpdates() async {
-    debugPrint('🔍 UpdateProvider: Iniciando verificación de actualizaciones...');
-    _isChecking = true;
-    notifyListeners();
-
-    try {
-      _updateInfo = await _updateService.checkForUpdate();
-      debugPrint('🔍 UpdateProvider: Resultado de checkForUpdate: $_updateInfo');
-      if (_updateInfo != null) {
-        debugPrint('✅ UpdateProvider: ¡Actualización disponible! Versión: ${_updateInfo!.latestVersion}');
-      } else {
-        debugPrint('ℹ️ UpdateProvider: No hay actualizaciones disponibles');
-      }
-    } finally {
-      _isChecking = false;
-      notifyListeners();
-    }
-  }
-
-  /// Descarga e instala automáticamente el APK
-  Future<String?> downloadUpdate() async {
-    if (_updateInfo == null) return null;
-
-    _isDownloading = true;
-    notifyListeners();
-
-    try {
-      final apkPath = await _updateService.downloadAndInstallUpdate(_updateInfo!);
-      if (apkPath != null) {
-        // Actualizar la información con la ruta del APK descargado
-        _updateInfo = UpdateInfo(
-          currentVersion: _updateInfo!.currentVersion,
-          latestVersion: _updateInfo!.latestVersion,
-          apkUrl: _updateInfo!.apkUrl,
-          releaseNotes: _updateInfo!.releaseNotes,
-          releaseDate: _updateInfo!.releaseDate,
-          downloadedApkPath: apkPath,
-        );
-        return apkPath;
-      } else {
-        // Si apkPath es null, significa que hubo un error
-        debugPrint('❌ UpdateProvider: Error en la descarga/instalación del APK');
-        return null;
-      }
-    } catch (e) {
-      debugPrint('❌ UpdateProvider: Excepción durante descarga: $e');
-      // Guardar el mensaje de error para mostrarlo en la UI
-      _lastErrorMessage = e.toString();
-      return null;
-    } finally {
-      _isDownloading = false;
-      notifyListeners();
-    }
-  }
-
-  /// Limpia la información de actualización
-  void clearUpdateInfo() {
-    _updateInfo = null;
-    notifyListeners();
-  }
-}
+import '../providers/update_provider.dart';
 
 /// Widget para mostrar notificaciones de actualización
 class UpdateNotificationBanner extends StatelessWidget {
@@ -125,25 +49,26 @@ class UpdateNotificationBanner extends StatelessWidget {
                 onPressed: updateProvider.isDownloading
                   ? null
                   : () async {
-                      final apkPath = await updateProvider.downloadUpdate();
-                      if (apkPath != null && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Descargando e instalando actualización...'),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
-                      } else if (context.mounted) {
-                        // Mostrar mensaje de error específico
-                        final errorMessage = updateProvider.lastErrorMessage ??
-                            'Error al descargar la actualización. Verifica conexión y permisos.';
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(errorMessage),
-                            backgroundColor: Colors.red,
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
+                      await updateProvider.downloadUpdate();
+                      if (context.mounted) {
+                        if (updateProvider.lastErrorMessage == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Descargando e instalando actualización...'),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } else {
+                          // Mostrar mensaje de error específico
+                          final errorMessage = updateProvider.lastErrorMessage!;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
                       }
                     },
                 child: updateProvider.isDownloading
@@ -225,25 +150,26 @@ class UpdateDialog extends StatelessWidget {
                 ? null
                 : () async {
                     Navigator.of(context).pop();
-                    final apkPath = await updateProvider.downloadUpdate();
-                    if (apkPath != null && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Descargando e instalando actualización...'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    } else if (context.mounted) {
-                      // Mostrar mensaje de error específico
-                      final errorMessage = updateProvider.lastErrorMessage ??
-                          'Error al descargar la actualización. Verifica conexión y permisos.';
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(errorMessage),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 5),
-                        ),
-                      );
+                    await updateProvider.downloadUpdate();
+                    if (context.mounted) {
+                      if (updateProvider.lastErrorMessage == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Descargando e instalando actualización...'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      } else {
+                        // Mostrar mensaje de error específico
+                        final errorMessage = updateProvider.lastErrorMessage!;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                      }
                     }
                   },
               child: updateProvider.isDownloading
@@ -264,89 +190,5 @@ class UpdateDialog extends StatelessWidget {
     return '${date.day.toString().padLeft(2, '0')}/'
            '${date.month.toString().padLeft(2, '0')}/'
            '${date.year}';
-  }
-}
-
-/// Ejemplo de integración en la pantalla principal
-class UpdateHomeScreenExample extends StatefulWidget {
-  const UpdateHomeScreenExample({super.key});
-
-  @override
-  State<UpdateHomeScreenExample> createState() => _UpdateHomeScreenExampleState();
-}
-
-class _UpdateHomeScreenExampleState extends State<UpdateHomeScreenExample> {
-  @override
-  void initState() {
-    super.initState();
-    // Verificar actualizaciones al iniciar la app
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UpdateProvider>().checkForUpdates();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Saray App'),
-        actions: [
-          // Botón para verificar actualizaciones manualmente
-          Consumer<UpdateProvider>(
-            builder: (context, updateProvider, child) {
-              return IconButton(
-                onPressed: updateProvider.isChecking
-                  ? null
-                  : () => updateProvider.checkForUpdates(),
-                icon: updateProvider.isChecking
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.refresh),
-                tooltip: 'Verificar actualizaciones',
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Banner de notificación de actualización
-          const UpdateNotificationBanner(),
-
-          // Contenido principal de la app
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('¡Bienvenido a Saray!'),
-                  const SizedBox(height: 20),
-
-                  // Botón para mostrar diálogo de actualización si hay una disponible
-                  Consumer<UpdateProvider>(
-                    builder: (context, updateProvider, child) {
-                      if (updateProvider.updateInfo == null) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return ElevatedButton(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (_) => const UpdateDialog(),
-                        ),
-                        child: const Text('Ver Detalles de Actualización'),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

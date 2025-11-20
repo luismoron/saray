@@ -1,103 +1,102 @@
-# Sistema de Actualizaciones Automáticas (OTA) - Guía de Configuración
+# Sistema de Actualizaciones Automáticas (OTA) - Documentación Técnica
 
 ## Resumen
-El sistema OTA permite actualizaciones automáticas de la aplicación Saray mediante verificación de versiones desde Google Drive y descarga manual de APKs.
+El sistema OTA permite a la aplicación Saray actualizarse automáticamente descargando el APK más reciente desde Google Drive. Debido a las restricciones de seguridad de Google Drive (páginas de advertencia de virus para archivos grandes), se ha implementado un sistema robusto de "scraping" para obtener el enlace de descarga real.
 
-## Arquitectura del Sistema
+## Arquitectura
 
-### Componentes Principales
-1. **UpdateService** (`lib/services/update_service.dart`)
-   - Verifica versiones disponibles desde Google Drive
-   - Compara versión actual vs versión remota
-   - Gestiona descargas de APK
+### 1. Flujo de Actualización
+1.  **Verificación:** La app descarga `version.json` desde Google Drive.
+2.  **Comparación:** Compara `version` del JSON con `package_info.version`.
+3.  **Descarga:**
+    *   Intenta descargar el APK directamente.
+    *   Si recibe un HTML (advertencia de virus), parsea el formulario HTML para extraer el token de confirmación (`confirm=xxxx`) y el UUID.
+    *   Reconstruye la URL de descarga con los parámetros correctos y reintenta.
+4.  **Instalación:**
+    *   Usa `FileProvider` para exponer el APK descargado de forma segura.
+    *   Lanza un `AndroidIntent` con `FLAG_GRANT_READ_URI_PERMISSION` para solicitar la instalación.
 
-2. **UpdateProvider** (`lib/providers/update_provider.dart`)
-   - Maneja estado de actualizaciones en la UI
-   - Controla visibilidad de notificaciones
+### 2. Configuración Requerida
 
-3. **UI Components**
-   - Banner de actualización en pantalla principal
-   - Botón contextual en AppBar
-   - Diálogo de detalles de versión
-
-4. **Archivos de Configuración**
-   - `version.json`: Información de versión y notas de release
-   - `pubspec.yaml`: Inclusión de assets
-
-## Configuración Inicial
-
-### 1. Archivo version.json
-Crear el archivo `version.json` en la raíz del proyecto:
-
+#### Archivo `version.json` (en Google Drive)
+Debe ser un archivo público con este formato:
 ```json
 {
   "version": "1.0.2",
-  "release_notes": "Nueva versión con mejoras de rendimiento y corrección de bugs menores.",
-  "release_date": "2025-11-20"
+  "release_notes": "Corrección de errores y mejoras de rendimiento.",
+  "release_date": "2025-11-20",
+  "apk_url": "https://drive.google.com/file/d/TU_ID_DE_ARCHIVO_APK/view?usp=sharing"
 }
 ```
 
-### 2. Inclusión en Assets
-Asegurar que `version.json` esté incluido en `pubspec.yaml`:
-
-```yaml
-flutter:
-  assets:
-    - version.json
-```
-
-### 3. Dependencias Requeridas
-Verificar en `pubspec.yaml`:
-
+#### Dependencias (`pubspec.yaml`)
 ```yaml
 dependencies:
-  dio: ^5.4.0
-  android_intent_plus: ^5.0.0
-  package_info_plus: ^8.0.0
-  permission_handler: ^11.3.0
+  dio: ^5.x.x              # Para descargas HTTP avanzadas
+  android_intent_plus: ^5.x.x # Para lanzar el instalador de Android
+  package_info_plus: ^8.x.x   # Para obtener la versión actual
+  permission_handler: ^11.x.x # Para solicitar permisos de instalación
+  path_provider: ^2.x.x       # Para rutas de almacenamiento
 ```
 
-## Implementación del Servicio
+#### Configuración Android (`AndroidManifest.xml`)
+Permisos necesarios:
+```xml
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
 
-### UpdateService
-```dart
-class UpdateService {
-  static const String _versionUrl = 'https://drive.google.com/uc?export=download&id=YOUR_VERSION_FILE_ID';
-  static const String _apkUrl = 'https://drive.google.com/uc?export=download&id=YOUR_APK_FILE_ID';
+Provider para instalación segura (dentro de `<application>`):
+```xml
+<provider
+    android:name="androidx.core.content.FileProvider"
+    android:authorities="${applicationId}.fileprovider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_paths" />
+</provider>
+```
 
-  Future<VersionInfo?> checkForUpdates() async {
-    try {
-      // Leer versión local desde assets
-      final localVersion = await _getLocalVersion();
+Archivo `android/app/src/main/res/xml/file_paths.xml`:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path name="external_files" path="." />
+    <external-files-path name="app_files" path="." />
+</paths>
+```
 
-      // Leer versión remota desde Google Drive
-      final remoteVersion = await _getRemoteVersion();
+## Componentes del Código
 
-      if (remoteVersion != null && _isNewerVersion(remoteVersion.version, localVersion)) {
-        return remoteVersion;
-      }
-    } catch (e) {
-      debugPrint('Error checking for updates: $e');
-    }
-    return null;
-  }
+### `UpdateService` (`lib/services/update_service.dart`)
+*   **`checkForUpdate()`**: Descarga y parsea `version.json`.
+*   **`downloadAndInstallUpdate()`**: Maneja la lógica compleja de descarga.
+    *   Detecta si la descarga es un HTML (< 1MB).
+    *   Busca formularios `<form action="...">` y campos ocultos.
+    *   Construye la URL final con `confirm=t` y `uuid`.
+*   **`_installApk()`**: Gestiona los permisos de Android 14+ y lanza el Intent.
 
-  Future<String> _getLocalVersion() async {
-    final jsonString = await rootBundle.loadString('version.json');
-    final jsonData = json.decode(jsonString);
-    return jsonData['version'];
-  }
+### `UpdateProvider` (`lib/providers/update_provider.dart`)
+*   Gestiona el estado (`isChecking`, `isDownloading`, `updateInfo`).
+*   Notifica a la UI para mostrar banners o diálogos.
 
-  Future<VersionInfo?> _getRemoteVersion() async {
-    final response = await Dio().get(_versionUrl);
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.data);
-      return VersionInfo.fromJson(jsonData);
-    }
-    return null;
-  }
+## Solución de Problemas Comunes
 
-  bool _isNewerVersion(String remoteVersion, String localVersion) {
+### "El widget de actualización no desaparece"
+*   **Causa:** La versión en `pubspec.yaml` del APK instalado es igual o menor a la de `version.json`.
+*   **Solución:** Asegúrate de incrementar `version` en `pubspec.yaml` ANTES de compilar el APK que subirás a Drive.
+
+### "Error: El archivo descargado es HTML"
+*   **Causa:** Google Drive cambió su página de advertencia de virus.
+*   **Solución:** Revisar los logs `📄 Contenido (desde body): ...` y ajustar las expresiones regulares en `UpdateService`.
+
+### "Error de análisis del paquete" al instalar
+*   **Causa:** Descarga corrupta o incompleta (HTML guardado como APK).
+*   **Solución:** El servicio ahora verifica automáticamente si el archivo es HTML antes de intentar instalarlo.
     // Lógica de comparación de versiones
     return _compareVersions(remoteVersion, localVersion) > 0;
   }

@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:path/path.dart' as path;
 
 /// Información de actualización disponible
 class UpdateInfo {
@@ -16,7 +17,6 @@ class UpdateInfo {
   final String apkUrl;
   final String releaseNotes;
   final DateTime? releaseDate;
-  final String? downloadedApkPath; // Ruta del APK descargado (opcional)
 
   UpdateInfo({
     required this.currentVersion,
@@ -24,27 +24,72 @@ class UpdateInfo {
     required this.apkUrl,
     required this.releaseNotes,
     this.releaseDate,
-    this.downloadedApkPath,
   });
 }
 
 /// Servicio para manejar actualizaciones automáticas de la aplicación desde Google Drive
 class UpdateService {
-  // Configuración de Google Drive
-  // Para obtener el ID del archivo: compartir el archivo en Google Drive y copiar el ID de la URL
-  // Ejemplo: https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing
-  // El ID sería: YOUR_FILE_ID
-  final String _apkDownloadUrl =
-      'https://drive.google.com/uc?export=download&id=13gJ4dpmFoe8-4ZZ1d_KzYDiV7ZowNaMq';
-  final String _versionInfoUrl =
-      'https://drive.google.com/uc?export=download&id=1NEdgg2zDL1Zr3QK6Oeos5iefTKm9eM4D';
+  // ==========================================================================
+  // CONFIGURACIÓN DE GOOGLE DRIVE
+  // ==========================================================================
 
-  // Instancia de Dio para las peticiones HTTP
-  final Dio _dio = Dio(BaseOptions(headers: {'User-Agent': 'Saray-App'}));
+  // ID del archivo version.json en Google Drive.
+  // Pasos para obtenerlo:
+  // 1. Sube tu archivo version.json a Google Drive.
+  // 2. Haz clic derecho > Compartir > Copiar enlace.
+  // 3. El enlace es algo como: https://drive.google.com/file/d/ESTE_ES_EL_ID/view?usp=sharing
+  // 4. Copia solo la parte del ID.
+  // 5. Asegúrate de que el acceso sea "Cualquiera con el enlace" (Público).
+  final String _driveVersionFileId = '13gJ4dpmFoe8-4ZZ1d_KzYDiV7ZowNaMq';
 
-  // Estado de la actualización
+  // ==========================================================================
+
+  final Dio _dio = Dio(BaseOptions(
+    headers: {'User-Agent': 'Saray-App'},
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+  ));
+
   bool _isCheckingUpdate = false;
   bool _isDownloading = false;
+
+  /// Convierte un ID de archivo de Google Drive en una URL de descarga directa
+  String _getDriveDownloadUrl(String fileIdOrUrl) {
+    String fileId = fileIdOrUrl;
+
+    // Intentar extraer ID de cualquier URL de Drive (incluso si ya es de descarga)
+    if (fileIdOrUrl.contains('drive.google.com')) {
+      try {
+        final uri = Uri.parse(fileIdOrUrl);
+        if (uri.queryParameters.containsKey('id')) {
+          fileId = uri.queryParameters['id']!;
+        } else if (uri.pathSegments.contains('d')) {
+          final index = uri.pathSegments.indexOf('d');
+          if (index + 1 < uri.pathSegments.length) {
+            fileId = uri.pathSegments[index + 1];
+          }
+        }
+      } catch (e) {
+        // Si falla el parseo, intentamos usar el string original limpio
+      }
+    }
+
+    // Limpiar ID de posibles parámetros extra o basura (ej. &uusp, /view, etc)
+    if (fileId.contains('&')) {
+      fileId = fileId.split('&').first;
+    }
+    if (fileId.contains('?')) {
+      fileId = fileId.split('?').first;
+    }
+    if (fileId.contains('/')) {
+      fileId = fileId.split('/').last;
+    }
+    
+    debugPrint('🔍 UpdateService: ID extraído: $fileId');
+
+    // Retornar URL limpia con confirmación para evitar advertencia de virus
+    return 'https://drive.google.com/uc?export=download&id=$fileId&confirm=t';
+  }
 
   /// Verifica si hay una actualización disponible
   Future<UpdateInfo?> checkForUpdate() async {
@@ -53,303 +98,385 @@ class UpdateService {
     try {
       _isCheckingUpdate = true;
 
-      // Obtener información de la versión actual
+      // 1. Obtener versión actual
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
+      debugPrint('🔍 UpdateService: Versión actual: ');
 
-      debugPrint('🔍 UpdateService: Versión actual: $currentVersion');
-
-      // Obtener información de versión desde Google Drive
-      debugPrint('🔍 UpdateService: Descargando info desde: $_versionInfoUrl');
+      // 2. Obtener información de la última versión desde Drive
       final versionInfo = await _getVersionInfo();
-
       if (versionInfo == null) {
         debugPrint('❌ UpdateService: No se pudo obtener información de versión');
         return null;
       }
 
       final latestVersion = versionInfo['version']?.toString() ?? '';
+      debugPrint('🔍 UpdateService: Última versión disponible: ');
 
-      debugPrint('🔍 UpdateService: Última versión disponible: $latestVersion');
-      debugPrint('🔍 UpdateService: Release notes: ${versionInfo['release_notes']}');
-
-      // Comparar versiones
-      final isNewer = _isNewerVersion(latestVersion, currentVersion);
-      debugPrint('🔍 UpdateService: Comparando versiones - Latest: $latestVersion, Current: $currentVersion, IsNewer: $isNewer');
-
-      if (isNewer) {
+      // 3. Comparar versiones
+      debugPrint('🔍 Comparando versiones: Local [$currentVersion] vs Remota [$latestVersion]');
+      if (_isNewerVersion(latestVersion, currentVersion)) {
         debugPrint('✅ UpdateService: ¡Nueva versión detectada!');
+
+        // Obtener URL del APK (puede ser ID o URL)
+        String apkSource = versionInfo['apk_url']?.toString() ?? '';
+        // Si no hay URL en el JSON, asumimos que no se puede actualizar
+        if (apkSource.isEmpty) {
+          debugPrint('❌ UpdateService: No se encontró apk_url en version.json');
+          return null;
+        }
+
+        final apkUrl = _getDriveDownloadUrl(apkSource);
+
         return UpdateInfo(
           currentVersion: currentVersion,
           latestVersion: latestVersion,
-          apkUrl: _apkDownloadUrl,
+          apkUrl: apkUrl,
           releaseNotes: versionInfo['release_notes']?.toString() ?? '',
-          releaseDate: DateTime.tryParse(
-            versionInfo['release_date']?.toString() ?? '',
-          ),
+          releaseDate: DateTime.tryParse(versionInfo['release_date']?.toString() ?? ''),
         );
       }
 
       debugPrint('ℹ️ UpdateService: La app está actualizada');
       return null;
     } catch (e) {
-      debugPrint('❌ UpdateService: Error al verificar actualización: $e');
+      debugPrint('❌ UpdateService: Error al verificar actualización: ');
       return null;
     } finally {
       _isCheckingUpdate = false;
     }
   }
 
-  /// Descarga el APK y devuelve la ruta del archivo descargado
-  Future<String?> downloadAndInstallUpdate(UpdateInfo updateInfo) async {
+  /// Descarga e instala la actualización
+  Future<void> downloadAndInstallUpdate(UpdateInfo updateInfo) async {
     if (_isDownloading) {
       debugPrint('⚠️ Ya hay una descarga en progreso');
-      return null;
+      return;
     }
 
     try {
       _isDownloading = true;
-      debugPrint('🚀 Iniciando descarga e instalación de actualización');
+      debugPrint('🚀 Iniciando descarga de actualización...');
 
-      // Verificar conexión a internet
-      try {
-        await _dio.get('https://www.google.com');
-        debugPrint('🌐 Conexión a internet: OK');
-      } catch (e) {
-        debugPrint('❌ Sin conexión a internet: $e');
-        throw Exception('Sin conexión a internet. Verifica tu conexión WiFi/datos.');
+      // 1. Obtener directorio de descargas privado de la app
+      // Usamos getExternalStorageDirectory() que devuelve /storage/emulated/0/Android/data/package/files
+      // Esto no requiere permisos de escritura especiales en Android 10+
+      final downloadDir = await getExternalStorageDirectory();
+      if (downloadDir == null) {
+        throw Exception('No se pudo acceder al almacenamiento externo');
       }
 
-      // Solicitar permisos necesarios
-      final hasPermission = await _requestPermissions();
-      if (!hasPermission) {
-        debugPrint('❌ No se concedieron los permisos necesarios');
-        throw Exception('Permisos denegados. Necesitas conceder permisos de instalación.');
+      final apkFileName = 'update_v${updateInfo.latestVersion}.apk';
+      final apkFile = File(path.join(downloadDir.path, apkFileName));
+
+      // Eliminar archivo anterior si existe para asegurar descarga limpia
+      if (await apkFile.exists()) {
+        await apkFile.delete();
       }
 
       debugPrint('⬇️ Descargando APK desde: ${updateInfo.apkUrl}');
+      debugPrint('📂 Destino: ${apkFile.path}');
 
-      // Obtener directorio de descargas
-      final downloadDir = await _getDownloadDirectory();
-      final apkFileName = 'saray-update-${updateInfo.latestVersion}.apk';
-      final apkFile = File('${downloadDir.path}/$apkFileName');
-
-      debugPrint('📁 Directorio de descarga: ${downloadDir.path}');
-      debugPrint('📄 Archivo APK: ${apkFile.path}');
-
-      // Descargar el APK
+      // 2. Descargar APK
       await _dio.download(
         updateInfo.apkUrl,
         apkFile.path,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             final progress = (received / total * 100).toStringAsFixed(0);
-            debugPrint('⬇️ Progreso: $progress% ($received/$total bytes)');
+            debugPrint('⬇️ Progreso: $progress%');
           }
         },
+        options: Options(
+          followRedirects: true,
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
       );
 
-      debugPrint('✅ APK descargado exitosamente en: ${apkFile.path}');
-
-      // Verificar que el archivo existe y tiene contenido
+      // 3. Verificar descarga
       if (await apkFile.exists()) {
-        final fileSize = await apkFile.length();
-        debugPrint('📊 Tamaño del archivo descargado: $fileSize bytes');
+        int fileSize = await apkFile.length();
+        debugPrint('✅ Descarga completada. Tamaño: $fileSize bytes');
+
+        // Verificar si es un archivo HTML (error de Drive)
+        if (fileSize < 1024 * 1024) { // < 1MB
+          bool isHtml = false;
+          String content = '';
+          
+          try {
+            content = await apkFile.readAsString();
+            if (content.contains('<!DOCTYPE html>') || content.contains('<html')) {
+              isHtml = true;
+            }
+          } catch (e) {
+            // Si falla leer como string, quizás es binario
+          }
+
+          if (isHtml) {
+            debugPrint('⚠️ Detectada página de advertencia de Drive. Intentando extraer enlace de confirmación...');
+            
+            // Debug: Buscar pistas en el contenido
+            final confirmIndex = content.indexOf('confirm=');
+            if (confirmIndex != -1) {
+               final start = (confirmIndex - 50) < 0 ? 0 : confirmIndex - 50;
+               final end = (confirmIndex + 100) > content.length ? content.length : confirmIndex + 100;
+               debugPrint('🔍 Pista: encontrado "confirm=" en el texto: ...${content.substring(start, end)}...');
+            }
+
+            String? confirmUrl;
+            
+            // Estrategia Unificada: Buscar cualquier enlace (href o action) que parezca de descarga
+            // Captura: href="..." o action="..." que contenga "export=download"
+            // Permite rutas relativas (/uc?...) o absolutas (https://drive...)
+            final RegExp linkRegex = RegExp(r'(?:href|action)="([^"]*?[?&]export=download[^"]*?)"');
+            final Iterable<Match> matches = linkRegex.allMatches(content);
+            
+            for (final match in matches) {
+              String url = match.group(1)!;
+              url = url.replaceAll('&amp;', '&');
+              
+              debugPrint('🔎 Candidato encontrado: $url');
+
+              // Prioridad: Enlace con token de confirmación
+              if (url.contains('confirm=')) {
+                 if (url.startsWith('http')) {
+                   confirmUrl = url;
+                 } else {
+                   confirmUrl = 'https://drive.google.com$url';
+                 }
+                 break; // Encontramos el mejor candidato
+              }
+              
+              // Fallback: Si no hay confirm, guardamos el primero que veamos
+              if (confirmUrl == null) {
+                 if (url.startsWith('http')) {
+                   confirmUrl = url;
+                 } else {
+                   confirmUrl = 'https://drive.google.com$url';
+                 }
+              }
+            }
+
+            // Estrategia Formulario (NUEVA): Parsear <form action="..."> y sus inputs
+            // El log mostró que Drive usa un form con action=".../download" y inputs hidden
+            if (confirmUrl == null) {
+               debugPrint('🔎 Buscando formulario de descarga...');
+               // Buscar el form que tenga action
+               final RegExp formRegex = RegExp(r'<form[^>]*action="([^"]+)"[^>]*>(.*?)</form>', dotAll: true);
+               final formMatch = formRegex.firstMatch(content);
+               
+               if (formMatch != null) {
+                 String actionUrl = formMatch.group(1)!;
+                 actionUrl = actionUrl.replaceAll('&amp;', '&');
+                 String formBody = formMatch.group(2)!;
+                 
+                 debugPrint('🔎 Formulario encontrado. Action: $actionUrl');
+                 
+                 // Extraer inputs hidden
+                 final RegExp inputRegex = RegExp(r'name="([^"]+)"\s+value="([^"]+)"');
+                 final inputMatches = inputRegex.allMatches(formBody);
+                 
+                 if (inputMatches.isNotEmpty) {
+                   final queryParams = <String>[];
+                   for (final m in inputMatches) {
+                     final key = m.group(1)!;
+                     final value = m.group(2)!;
+                     queryParams.add('$key=$value');
+                     debugPrint('   + Param: $key = $value');
+                   }
+                   
+                   final separator = actionUrl.contains('?') ? '&' : '?';
+                   confirmUrl = '$actionUrl$separator${queryParams.join('&')}';
+                 }
+               }
+            }
+            
+            // Estrategia de Respaldo: Buscar token confirm=XXXX en cualquier parte del texto
+            if (confirmUrl == null) {
+               final RegExp tokenRegex = RegExp(r'confirm=([a-zA-Z0-9_-]+)');
+               final tokenMatch = tokenRegex.firstMatch(content);
+               if (tokenMatch != null) {
+                 final token = tokenMatch.group(1)!;
+                 debugPrint('🔎 Token encontrado en texto plano: $token');
+                 
+                 String fileId = '';
+                 final uri = Uri.parse(updateInfo.apkUrl);
+                 if (uri.queryParameters.containsKey('id')) {
+                   fileId = uri.queryParameters['id']!;
+                 }
+                 
+                 if (fileId.isNotEmpty) {
+                   confirmUrl = 'https://drive.google.com/uc?export=download&id=$fileId&confirm=$token';
+                 }
+               }
+            }
+            
+            if (confirmUrl != null) {
+              debugPrint('🔄 Reintentando descarga con token de confirmación: $confirmUrl');
+              
+              // Reintentar descarga
+              int lastProgress = -1;
+              await _dio.download(
+                confirmUrl,
+                apkFile.path,
+                onReceiveProgress: (received, total) {
+                  if (total != -1) {
+                    final progress = (received / total * 100).toInt();
+                    // Solo imprimir cada 10% para no saturar el log
+                    if (progress != lastProgress && (progress % 10 == 0 || progress == 100)) {
+                        debugPrint('⬇️ Progreso (Reintento): $progress%');
+                        lastProgress = progress;
+                    }
+                  }
+                },
+              );
+              
+              fileSize = await apkFile.length();
+              debugPrint('✅ Segunda descarga completada. Tamaño: $fileSize bytes');
+              
+              // Verificar de nuevo si sigue siendo HTML (caso de error persistente)
+              if (fileSize < 1024 * 1024) {
+                 try {
+                    final newContent = await apkFile.readAsString();
+                    if (newContent.contains('<!DOCTYPE html>') || newContent.contains('<html')) {
+                       throw Exception('Error persistente: Google Drive sigue devolviendo una página HTML.');
+                    }
+                 } catch (_) {}
+              }
+            } else {
+              debugPrint('❌ ERROR: El archivo descargado es una página HTML y no se encontró enlace de confirmación.');
+              
+              // Intentar imprimir el body o una sección central para mejor depuración
+              int startBody = content.indexOf('<body');
+              if (startBody == -1) startBody = 0;
+              int printLen = 2000;
+              String debugContent = content.substring(startBody, (startBody + printLen) > content.length ? content.length : startBody + printLen);
+              debugPrint('📄 Contenido (desde body): $debugContent...');
+              
+              throw Exception('El archivo descargado no es un APK válido (es HTML).');
+            }
+          } else {
+             debugPrint('⚠️ ADVERTENCIA: El archivo parece muy pequeño ($fileSize bytes) pero no es HTML texto plano.');
+          }
+        }
+
+        // 4. Instalar APK
+        await _installApk(apkFile);
       } else {
-        debugPrint('❌ El archivo descargado no existe');
-        return null;
+        throw Exception('El archivo descargado no aparece en el sistema de archivos');
       }
+    } catch (e) {
+      debugPrint('❌ Error en proceso de actualización: $e');
+      rethrow;
+    } finally {
+      _isDownloading = false;
+    }
+  }
 
-      // Crear intent para instalar el APK automáticamente
-      try {
-        debugPrint('🔄 Iniciando instalación automática del APK...');
+  /// Lanza el intent de instalación
+  Future<void> _installApk(File apkFile) async {
+    if (!Platform.isAndroid) return;
 
-        // Para Android moderno, usar ACTION_INSTALL_PACKAGE si está disponible
-        final intent = AndroidIntent(
-          action: 'android.intent.action.INSTALL_PACKAGE',
-          data: 'file://${apkFile.path}',
-          type: 'application/vnd.android.package-archive',
-          flags: <int>[
-            Flag.FLAG_ACTIVITY_NEW_TASK,
-            Flag.FLAG_GRANT_READ_URI_PERMISSION,
-          ],
-        );
+    try {
+      debugPrint('📦 Preparando instalación...');
 
-        debugPrint('📱 Enviando intent de instalación: ${intent.action}');
-        await intent.launch();
-
-        debugPrint('✅ Intent de instalación enviado exitosamente');
-        debugPrint('📋 El sistema debería mostrar el diálogo de instalación automáticamente');
-
-        return apkFile.path;
-      } catch (e) {
-        debugPrint('❌ Error al crear intent de instalación automática: $e');
-
-        // Fallback: intentar con ACTION_VIEW (más compatible)
-        try {
-          debugPrint('🔄 Intentando fallback con ACTION_VIEW...');
-          final fallbackIntent = AndroidIntent(
-            action: 'android.intent.action.VIEW',
-            data: 'file://${apkFile.path}',
-            type: 'application/vnd.android.package-archive',
-            flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
-          );
-          await fallbackIntent.launch();
-          debugPrint('✅ Fallback intent enviado exitosamente');
-          return apkFile.path;
-        } catch (fallbackError) {
-          debugPrint('❌ Error en fallback intent: $fallbackError');
-          return null;
+      // Verificar permiso REQUEST_INSTALL_PACKAGES
+      if (!await Permission.requestInstallPackages.isGranted) {
+        debugPrint('🔐 Solicitando permiso de instalación de paquetes...');
+        final status = await Permission.requestInstallPackages.request();
+        if (!status.isGranted) {
+          throw Exception('Permiso de instalación denegado por el usuario');
         }
       }
+
+      final packageInfo = await PackageInfo.fromPlatform();
+      final packageName = packageInfo.packageName;
+
+      // Construir URI usando FileProvider
+      // Hemos configurado <external-files-path name='app_files' path='.' /> en file_paths.xml
+      // Esto mapea a getExternalStorageDirectory() (Android/data/package/files)
+      // Por lo tanto, la URI es: content://package.fileprovider/app_files/nombre_archivo.apk
+
+      final fileName = path.basename(apkFile.path);
+      final contentUri = 'content://$packageName.fileprovider/app_files/$fileName';
+
+      debugPrint('🔗 URI de instalación: $contentUri');
+
+      final intent = AndroidIntent(
+        action: 'android.intent.action.VIEW',
+        data: contentUri,
+        type: 'application/vnd.android.package-archive',
+        flags: <int>[
+          Flag.FLAG_ACTIVITY_NEW_TASK,
+          Flag.FLAG_GRANT_READ_URI_PERMISSION, // Crucial para que el instalador pueda leer el archivo
+        ],
+      );
+
+      debugPrint('🚀 Lanzando instalador...');
+      await intent.launch();
     } catch (e) {
-      debugPrint('Error al descargar APK: $e');
-      return null;
-    } finally {
-      _isDownloading = false;
+      debugPrint('❌ Error al intentar instalar: $e');
+      throw Exception('Error al iniciar la instalación: $e');
     }
   }
 
-  /// Solicita permisos necesarios para la instalación
-  Future<bool> _requestPermissions() async {
-    try {
-      debugPrint('🔐 Solicitando permisos de instalación...');
-
-      // Solicitar permiso de instalación de paquetes
-      final installPermission = await Permission.requestInstallPackages.request();
-      debugPrint('🔐 Permiso de instalación: ${installPermission.isGranted}');
-
-      // Solicitar permiso de almacenamiento (para Android < 13)
-      final storagePermission = await Permission.storage.request();
-      debugPrint('🔐 Permiso de almacenamiento: ${storagePermission.isGranted}');
-
-      // Para Android 13+ también solicitar permiso de fotos/videos
-      final photosPermission = await Permission.photos.request();
-      debugPrint('🔐 Permiso de fotos: ${photosPermission.isGranted}');
-
-      final hasPermissions = installPermission.isGranted &&
-          (storagePermission.isGranted || photosPermission.isGranted);
-
-      debugPrint('🔐 Todos los permisos concedidos: $hasPermissions');
-      return hasPermissions;
-    } catch (e) {
-      debugPrint('❌ Error al solicitar permisos: $e');
-      return false;
-    }
-  }
-
-  /// Obtiene el directorio de descargas
-  Future<Directory> _getDownloadDirectory() async {
-    if (Platform.isAndroid) {
-      // Para Android, usar el directorio de descargas público
-      final downloadDir = Directory('/storage/emulated/0/Download');
-      if (!await downloadDir.exists()) {
-        await downloadDir.create(recursive: true);
-      }
-      return downloadDir;
-    } else {
-      // Para otras plataformas, usar el directorio temporal
-      return await getTemporaryDirectory();
-    }
-  }
-
-  /// Obtiene información de versión (primero intenta Google Drive, luego assets como fallback)
+  /// Obtiene el JSON de versión desde Drive
   Future<Map<String, dynamic>?> _getVersionInfo() async {
-    // Primero intentar descargar desde Google Drive
     try {
-      debugPrint('🔍 _getVersionInfo: Intentando descargar version.json desde Google Drive');
-
-      final response = await _dio.get(_versionInfoUrl);
-      if (response.statusCode == 200) {
-        final content = response.data.toString();
-        debugPrint('✅ _getVersionInfo: Datos obtenidos desde Google Drive: $content');
-
-        final data = json.decode(content) as Map<String, dynamic>;
-        return data;
-      }
-    } catch (e) {
-      debugPrint('⚠️ _getVersionInfo: No se pudo descargar desde Google Drive, usando fallback: $e');
-    }
-
-    // Fallback: leer desde assets
-    try {
-      debugPrint('🔍 _getVersionInfo: Usando version.json desde assets como fallback');
-
-      final content = await rootBundle.loadString('version.json');
-      debugPrint('🔍 _getVersionInfo: Contenido desde assets: $content');
-
-      final data = json.decode(content) as Map<String, dynamic>;
-      debugPrint('✅ _getVersionInfo: Datos obtenidos desde assets: $data');
-      return data;
-    } catch (e) {
-      debugPrint('❌ _getVersionInfo: Error al leer desde assets: $e');
-      return null;
-    }
-  }
-
-  /// Compara versiones para determinar si la nueva es más reciente
-  bool _isNewerVersion(String latestVersion, String currentVersion) {
-    try {
-      final latestParts = latestVersion.split('.').map(int.parse).toList();
-      final currentParts = currentVersion.split('.').map(int.parse).toList();
-
-      // Comparar versión mayor
-      if (latestParts[0] > currentParts[0]) return true;
-      if (latestParts[0] < currentParts[0]) return false;
-
-      // Comparar versión menor
-      if (latestParts[1] > currentParts[1]) return true;
-      if (latestParts[1] < currentParts[1]) return false;
-
-      // Comparar versión de parche
-      if (latestParts[2] > currentParts[2]) return true;
-
-      return false;
-    } catch (e) {
-      debugPrint('Error al comparar versiones: $e');
-      return false;
-    }
-  }
-
-  /// Descarga el APK sin instalarlo automáticamente
-  Future<String?> downloadApkOnly(UpdateInfo updateInfo) async {
-    if (_isDownloading) return null;
-
-    try {
-      _isDownloading = true;
-
-      // Solicitar permisos necesarios
-      final hasPermission = await _requestPermissions();
-      if (!hasPermission) {
-        debugPrint('❌ UpdateService: No se concedieron los permisos necesarios');
+      if (_driveVersionFileId == 'TU_ID_DEL_ARCHIVO_VERSION_JSON_AQUI') {
+        debugPrint('⚠️ UpdateService: ID de archivo de versión no configurado.');
         return null;
       }
 
-      debugPrint('⬇️ UpdateService: Descargando APK desde: ${updateInfo.apkUrl}');
+      final url = _getDriveDownloadUrl(_driveVersionFileId);
+      debugPrint('🌐 Obteniendo info de versión desde: ');
 
-      // Obtener directorio de descargas
-      final downloadDir = await _getDownloadDirectory();
-      final apkFileName = 'saray-update-${updateInfo.latestVersion}.apk';
-      final apkFile = File('${downloadDir.path}/$apkFileName');
+      final response = await _dio.get(url);
 
-      // Descargar el APK
-      await _dio.download(
-        updateInfo.apkUrl,
-        apkFile.path,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            debugPrint('⬇️ UpdateService: Progreso: ${(received / total * 100).toStringAsFixed(0)}%');
-          }
-        },
-      );
-
-      debugPrint('✅ UpdateService: APK descargado en: ${apkFile.path}');
-      return apkFile.path;
-    } catch (e) {
-      debugPrint('❌ UpdateService: Error al descargar APK: $e');
+      if (response.statusCode == 200) {
+        if (response.data is Map) {
+          return response.data as Map<String, dynamic>;
+        } else if (response.data is String) {
+          return json.decode(response.data) as Map<String, dynamic>;
+        }
+      }
       return null;
-    } finally {
-      _isDownloading = false;
+    } catch (e) {
+      debugPrint('⚠️ Error obteniendo versión: ');
+      // Fallback a assets para desarrollo/pruebas
+      try {
+        final content = await rootBundle.loadString('version.json');
+        return json.decode(content) as Map<String, dynamic>;
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+
+  /// Compara versiones semánticas (x.y.z)
+  bool _isNewerVersion(String latestVersion, String currentVersion) {
+    try {
+      final latestParts = latestVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+      final currentParts = currentVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+
+      // Normalizar longitudes
+      while (latestParts.length < 3) {
+        latestParts.add(0);
+      }
+      while (currentParts.length < 3) {
+        currentParts.add(0);
+      }
+
+      for (int i = 0; i < 3; i++) {
+        if (latestParts[i] > currentParts[i]) return true;
+        if (latestParts[i] < currentParts[i]) return false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error comparando versiones: ');
+      return false;
     }
   }
 }
