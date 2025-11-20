@@ -18,25 +18,32 @@ class ProductCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 2,
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Primera fila: imagen, información y precio a la derecha
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // Columna izquierda: Imagen + Categoría debajo
+              Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // Imagen del producto
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: theme.colorScheme.surfaceContainerHighest,
@@ -58,123 +65,127 @@ class ProductCard extends StatelessWidget {
                           )
                         : Icon(
                             Icons.inventory_2,
-                            size: 40,
+                            size: 30,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                   ),
 
-                  const SizedBox(width: 12),
+                  const SizedBox(height: 6),
 
-                  // Información básica (sin precio)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Nombre
-                        Text(
-                          product.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        // Descripción
-                        Text(
-                          product.description,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              // Precio arriba del botón
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  '\$${product.price.toStringAsFixed(2)}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Segunda fila: categoría, stock y botón
-              Row(
-                children: [
-                  // Categoría (movida aquí)
+                  // Categoría debajo de la imagen
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 6,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       product.category,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
                       ),
                     ),
                   ),
+                ],
+              ),
 
-                  const Spacer(),
+              const SizedBox(width: 12),
 
-                  // Stock y botón en columna compacta
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // Stock
-                      Text(
+              // Información del producto (expandida)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nombre y precio en fila superior
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            product.name,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              height: 1.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '\$${product.price.toStringAsFixed(2)}',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // Descripción
+                    Text(
+                      product.description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Stock
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: product.stock > 0
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : theme.colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
                         '${l10n.stock}: ${product.stock}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: product.stock > 0
                               ? theme.colorScheme.onSurfaceVariant
-                              : theme.colorScheme.error,
+                              : theme.colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
                         ),
                       ),
+                    ),
 
-                      const SizedBox(width: 8),
+                    const SizedBox(height: 8),
 
-                      // Botón de agregar al carrito
-                      if (product.stock > 0)
-                        ElevatedButton(
+                    // Botón de ancho completo
+                    if (product.stock > 0)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
                           onPressed: () => _addToCart(context),
+                          icon: const Icon(Icons.add_shopping_cart, size: 16),
+                          label: const Text('Agregar'),
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            minimumSize: const Size(80, 32),
+                            padding: const EdgeInsets.symmetric(vertical: 6),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
-                          child: const Text(
-                            'Agregar',
-                            style: TextStyle(fontSize: 12),
-                          ),
                         ),
-                    ],
-                  ),
-                ],
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
