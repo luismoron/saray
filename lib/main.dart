@@ -33,9 +33,9 @@ void main() async {
     // await FirebaseAppCheck.instance.activate(
     //   androidProvider: AndroidProvider.debug,
     // );
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization failed: $e');
   }
   runApp(const MyApp());
 }
@@ -53,7 +53,8 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Bazar de Saray',
-        scaffoldMessengerKey: EnhancedNotificationService().scaffoldMessengerKey,
+        scaffoldMessengerKey:
+            EnhancedNotificationService().scaffoldMessengerKey,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
@@ -70,10 +71,8 @@ class MyApp extends StatelessWidget {
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
           '/profile': (context) => const ProfileScreen(),
-          '/admin': (context) => const RouteGuard(
-                requiredRole: 'admin',
-                child: const AdminScreen(),
-              ),
+          '/admin': (context) =>
+              const RouteGuard(requiredRole: 'admin', child: AdminScreen()),
           '/order-history': (context) => const OrderHistoryScreen(),
           '/notifications': (context) => const NotificationCenter(),
         },
@@ -91,11 +90,7 @@ class AuthWrapper extends StatelessWidget {
     final cartProvider = Provider.of<CartProvider>(context);
 
     if (!authProvider.isInitialized) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     } else if (authProvider.isAuthenticated && authProvider.user != null) {
       // Inicializar carrito cuando el usuario esté autenticado
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -128,26 +123,18 @@ class RouteGuard extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/login');
       });
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // Si el usuario no tiene el rol requerido, mostrar acceso denegado
     if (user.role != requiredRole) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Acceso Denegado'),
-        ),
+        appBar: AppBar(title: const Text('Acceso Denegado')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.lock_outline,
-                size: 80,
-                color: Colors.red,
-              ),
+              const Icon(Icons.lock_outline, size: 80, color: Colors.red),
               const SizedBox(height: 16),
               const Text(
                 'No tienes permisos para acceder a esta sección',

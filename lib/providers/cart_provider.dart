@@ -41,20 +41,22 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _cartSubscription = _cartService.getUserCart(_currentUserId!).listen(
-        (cartItems) {
-          _cartItems = cartItems;
-          _isLoading = false;
-          notifyListeners();
-        },
-        onError: (error) {
-          print('Error loading cart: $error');
-          _isLoading = false;
-          notifyListeners();
-        },
-      );
+      _cartSubscription = _cartService
+          .getUserCart(_currentUserId!)
+          .listen(
+            (cartItems) {
+              _cartItems = cartItems;
+              _isLoading = false;
+              notifyListeners();
+            },
+            onError: (error) {
+              debugPrint('Error loading cart: $error');
+              _isLoading = false;
+              notifyListeners();
+            },
+          );
     } catch (e) {
-      print('Error setting up cart stream: $e');
+      debugPrint('Error setting up cart stream: $e');
       _isLoading = false;
       notifyListeners();
     }
@@ -72,16 +74,21 @@ class CartProvider with ChangeNotifier {
     );
 
     // Actualizar localmente para feedback inmediato
-    final existingIndex = _cartItems.indexWhere((item) => item.product.id == product.id);
+    final existingIndex = _cartItems.indexWhere(
+      (item) => item.product.id == product.id,
+    );
     if (existingIndex != -1) {
       // Si ya existe, incrementar cantidad localmente
       final existingItem = _cartItems[existingIndex];
       _cartItems[existingIndex] = existingItem.copyWith(
-        quantity: existingItem.quantity + quantity
+        quantity: existingItem.quantity + quantity,
       );
     } else {
       // Si no existe, agregar nuevo item con ID temporal
-      _cartItems.insert(0, cartItem.copyWith(id: 'temp_${DateTime.now().millisecondsSinceEpoch}'));
+      _cartItems.insert(
+        0,
+        cartItem.copyWith(id: 'temp_${DateTime.now().millisecondsSinceEpoch}'),
+      );
     }
     notifyListeners();
 
@@ -94,7 +101,9 @@ class CartProvider with ChangeNotifier {
           // Ya se actualizó la cantidad, no necesitamos hacer nada más
         } else {
           // Reemplazar el item temporal con el real
-          final tempIndex = _cartItems.indexWhere((item) => item.id.startsWith('temp_'));
+          final tempIndex = _cartItems.indexWhere(
+            (item) => item.id.startsWith('temp_'),
+          );
           if (tempIndex != -1) {
             _cartItems[tempIndex] = _cartItems[tempIndex].copyWith(id: result);
           }
@@ -105,7 +114,7 @@ class CartProvider with ChangeNotifier {
         // Revertir cambios locales si falló
         if (existingIndex != -1) {
           _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
-            quantity: _cartItems[existingIndex].quantity - quantity
+            quantity: _cartItems[existingIndex].quantity - quantity,
           );
         } else {
           _cartItems.removeWhere((item) => item.id.startsWith('temp_'));
@@ -114,11 +123,11 @@ class CartProvider with ChangeNotifier {
         return false;
       }
     } catch (e) {
-      print('Error adding to cart: $e');
+      debugPrint('Error adding to cart: $e');
       // Revertir cambios locales si falló
       if (existingIndex != -1) {
         _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
-          quantity: _cartItems[existingIndex].quantity - quantity
+          quantity: _cartItems[existingIndex].quantity - quantity,
         );
       } else {
         _cartItems.removeWhere((item) => item.id.startsWith('temp_'));
@@ -146,7 +155,11 @@ class CartProvider with ChangeNotifier {
 
     // Sincronizar con Firestore
     try {
-      final success = await _cartService.updateCartItemQuantity(_currentUserId!, cartItemId, quantity);
+      final success = await _cartService.updateCartItemQuantity(
+        _currentUserId!,
+        cartItemId,
+        quantity,
+      );
       if (!success) {
         // Revertir cambios locales si falló
         if (quantity <= 0) {
@@ -156,7 +169,10 @@ class CartProvider with ChangeNotifier {
             orElse: () => _cartItems[index].copyWith(quantity: oldQuantity),
           );
           if (removedItem.id != cartItemId) {
-            _cartItems.insert(index, removedItem.copyWith(quantity: oldQuantity));
+            _cartItems.insert(
+              index,
+              removedItem.copyWith(quantity: oldQuantity),
+            );
           }
         } else {
           _cartItems[index] = _cartItems[index].copyWith(quantity: oldQuantity);
@@ -165,7 +181,7 @@ class CartProvider with ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error updating cart item: $e');
+      debugPrint('Error updating cart item: $e');
       // Revertir cambios locales si falló
       if (quantity <= 0) {
         final removedItem = _cartItems.firstWhere(
@@ -209,7 +225,10 @@ class CartProvider with ChangeNotifier {
 
     // Sincronizar con Firestore
     try {
-      final success = await _cartService.removeFromCart(_currentUserId!, cartItemId);
+      final success = await _cartService.removeFromCart(
+        _currentUserId!,
+        cartItemId,
+      );
       if (!success) {
         // Revertir cambios locales si falló
         _cartItems.insert(index, removedItem);
@@ -217,7 +236,7 @@ class CartProvider with ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error removing from cart: $e');
+      debugPrint('Error removing from cart: $e');
       // Revertir cambios locales si falló
       _cartItems.insert(index, removedItem);
       notifyListeners();
@@ -244,7 +263,7 @@ class CartProvider with ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error clearing cart: $e');
+      debugPrint('Error clearing cart: $e');
       // Revertir cambios locales si falló
       _cartItems.addAll(clearedItems);
       notifyListeners();
@@ -261,7 +280,22 @@ class CartProvider with ChangeNotifier {
   int getProductQuantity(String productId) {
     final item = _cartItems.firstWhere(
       (item) => item.product.id == productId,
-      orElse: () => CartItem(id: '', product: Product(id: '', name: '', description: '', price: 0, category: '', stock: 0, imageUrls: [], createdAt: DateTime.now(), updatedAt: DateTime.now()), quantity: 0, addedAt: DateTime.now()),
+      orElse: () => CartItem(
+        id: '',
+        product: Product(
+          id: '',
+          name: '',
+          description: '',
+          price: 0,
+          category: '',
+          stock: 0,
+          imageUrls: [],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+        quantity: 0,
+        addedAt: DateTime.now(),
+      ),
     );
     return item.quantity;
   }

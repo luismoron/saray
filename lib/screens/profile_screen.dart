@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/auth_provider.dart';
 import '../models/user.dart';
 
@@ -18,15 +17,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = authProvider.user;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perfil'),
-      ),
+      appBar: AppBar(title: const Text('Perfil')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -47,22 +42,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildInfoRow('Nombre', user.name),
                     _buildInfoRow('Email', user.email),
                     _buildInfoRow('Teléfono', user.phone ?? 'No especificado'),
-                    _buildInfoRow('Dirección', user.address ?? 'No especificada'),
+                    _buildInfoRow(
+                      'Dirección',
+                      user.address ?? 'No especificada',
+                    ),
                     _buildInfoRow('Rol', _getRoleDisplayName(user.role)),
                     const SizedBox(height: 16),
                     // Los usuarios normales no pueden solicitar ser vendedores
                     // Solo los admins pueden asignar roles desde el panel de administración
                     if (user.role == 'seller_pending') ...[
-                      const Text('Solicitud de vendedor enviada, esperando aprobación.'),
+                      const Text(
+                        'Solicitud de vendedor enviada, esperando aprobación.',
+                      ),
                     ] else if (user.role == 'seller') ...[
                       const Text('Eres vendedor aprobado.'),
-                      // TODO: Agregar opciones de vendedor
                     ],
                     ElevatedButton(
                       onPressed: () => _showEditProfileDialog(context, user),
                       child: const Text('Editar Perfil'),
                     ),
-                    // TODO: Remover después de asignar admin inicial
                     if (user.role != 'admin') ...[
                       const SizedBox(height: 8),
                       ElevatedButton(
@@ -170,34 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _requestSellerStatus(BuildContext context, String userId) async {
-    try {
-      await FirebaseFirestore.instance.collection('seller_requests').add({
-        'userId': userId,
-        'status': 'pending',
-        'requestedAt': Timestamp.now(),
-      });
 
-      // Actualizar rol del usuario a 'seller_pending'
-      await FirebaseFirestore.instance.collection('users').doc(userId).update({
-        'role': 'seller_pending',
-      });
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Solicitud enviada. Esperando aprobación.'), duration: Duration(seconds: 2)),
-        );
-        // Refrescar pantalla
-        setState(() {});
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), duration: Duration(seconds: 2)),
-        );
-      }
-    }
-  }
 
   void _showEditProfileDialog(BuildContext context, User user) {
     final nameController = TextEditingController(text: user.name);
@@ -206,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
+      builder: (BuildContext dialogContext) => AlertDialog(
         title: const Text('Editar Perfil'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -227,17 +198,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () async {
-              // TODO: Actualizar usuario en Firestore
               // Por ahora, solo cerrar
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Perfil actualizado (simulado)'), duration: Duration(seconds: 2)),
-              );
+              Navigator.of(dialogContext).pop();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Perfil actualizado (simulado)'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             },
             child: const Text('Guardar'),
           ),
@@ -253,7 +228,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Asignar Rol Admin'),
-        content: const Text('¿Estás seguro de que quieres asignarte el rol de administrador? Esta acción es irreversible.'),
+        content: const Text(
+          '¿Estás seguro de que quieres asignarte el rol de administrador? Esta acción es irreversible.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -269,12 +246,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (confirmed == true) {
       final success = await authProvider.assignAdminRole();
-      if (success && mounted) {
+      if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Rol admin asignado exitosamente')),
         );
         setState(() {}); // Refrescar la UI
-      } else if (mounted) {
+      } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('❌ Error al asignar rol admin'),

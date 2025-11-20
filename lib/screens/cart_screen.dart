@@ -22,7 +22,9 @@ class _CartScreenState extends State<CartScreen> {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
       // Solo inicializar si el usuario está autenticado y el carrito no está inicializado
-      if (authProvider.user != null && cartProvider.cartItems.isEmpty && !cartProvider.isLoading) {
+      if (authProvider.user != null &&
+          cartProvider.cartItems.isEmpty &&
+          !cartProvider.isLoading) {
         cartProvider.initializeCart(authProvider.user!.id);
       }
     });
@@ -35,7 +37,7 @@ class _CartScreenState extends State<CartScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.cart ?? 'Carrito'),
+        title: Text(l10n.cart),
         actions: [
           Consumer<CartProvider>(
             builder: (context, cartProvider, child) {
@@ -60,9 +62,7 @@ class _CartScreenState extends State<CartScreen> {
 
           // Si está cargando y no hay items, mostrar loading
           if (cartProvider.isLoading && !cartProvider.hasItems) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           // Si hay items, mostrarlos inmediatamente (incluso si está cargando más datos)
@@ -77,9 +77,12 @@ class _CartScreenState extends State<CartScreen> {
                     final cartItem = cartProvider.cartItems[index];
                     return CartItemCard(
                       cartItem: cartItem,
-                      onIncrement: () => cartProvider.incrementQuantity(cartItem.id),
-                      onDecrement: () => cartProvider.decrementQuantity(cartItem.id),
-                      onRemove: () => _removeCartItem(context, cartProvider, cartItem),
+                      onIncrement: () =>
+                          cartProvider.incrementQuantity(cartItem.id),
+                      onDecrement: () =>
+                          cartProvider.decrementQuantity(cartItem.id),
+                      onRemove: () =>
+                          _removeCartItem(context, cartProvider, cartItem),
                     );
                   },
                 ),
@@ -94,7 +97,11 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildEmptyCart(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildEmptyCart(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,14 +138,19 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCartSummary(BuildContext context, CartProvider cartProvider, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildCartSummary(
+    BuildContext context,
+    CartProvider cartProvider,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -201,7 +213,11 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _removeCartItem(BuildContext context, CartProvider cartProvider, cartItem) {
+  void _removeCartItem(
+    BuildContext context,
+    CartProvider cartProvider,
+    cartItem,
+  ) {
     cartProvider.removeFromCart(cartItem.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

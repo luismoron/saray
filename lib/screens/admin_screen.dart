@@ -17,15 +17,9 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const ProductsTab(),
-    const UsersTab(),
-  ];
+  final List<Widget> _screens = [const ProductsTab(), const UsersTab()];
 
-  final List<String> _titles = [
-    'Productos',
-    'Usuarios',
-  ];
+  final List<String> _titles = ['Productos', 'Usuarios'];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -54,19 +48,14 @@ class _AdminScreenState extends State<AdminScreen> {
             ),
         ],
       ),
-      body: SizedBox.expand(
-        child: _screens[_selectedIndex],
-      ),
+      body: SizedBox.expand(child: _screens[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory),
             label: 'Productos',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Usuarios',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Usuarios'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).primaryColor,
@@ -75,8 +64,8 @@ class _AdminScreenState extends State<AdminScreen> {
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () => _showAddProductDialog(context),
-              child: const Icon(Icons.add),
               tooltip: 'Agregar Producto',
+              child: const Icon(Icons.add),
             )
           : null,
     );
@@ -87,104 +76,6 @@ class _AdminScreenState extends State<AdminScreen> {
       context: context,
       builder: (context) => const ProductFormDialog(),
     );
-  }
-
-  void _showEditProductDialog(BuildContext context, Product product) {
-    showDialog(
-      context: context,
-      builder: (context) => ProductFormDialog(product: product),
-    );
-  }
-
-  void _confirmDeleteProduct(BuildContext context, Product product) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar Producto'),
-        content: Text('¿Estás seguro de que quieres eliminar "${product.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final productProvider = Provider.of<ProductProvider>(context, listen: false);
-              final success = await productProvider.deleteProduct(product.id);
-              if (success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Producto eliminado'), duration: Duration(seconds: 2)),
-                );
-              } else if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Error al eliminar producto'),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getRoleDisplayName(String role) {
-    switch (role) {
-      case 'buyer':
-        return 'Comprador';
-      case 'seller':
-        return 'Vendedor';
-      case 'admin':
-        return 'Administrador';
-      default:
-        return role;
-    }
-  }
-
-  Color _getRoleColor(String role) {
-    switch (role) {
-      case 'buyer':
-        return Colors.blue;
-      case 'seller':
-        return Colors.green;
-      case 'admin':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  void _changeUserRole(BuildContext context, String userId, String newRole, String userName) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'role': newRole});
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Rol de $userName cambiado a ${_getRoleDisplayName(newRole)}'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cambiar rol: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    }
   }
 }
 
@@ -207,9 +98,7 @@ class _ProductsTabState extends State<ProductsTab> {
           }
 
           if (productProvider.products.isEmpty) {
-            return const Center(
-              child: Text('No hay productos disponibles'),
-            );
+            return const Center(child: Text('No hay productos disponibles'));
           }
 
           return ListView.builder(
@@ -230,18 +119,22 @@ class _ProductsTabState extends State<ProductsTab> {
                         )
                       : const Icon(Icons.image_not_supported),
                   title: Text(product.name),
-                  subtitle: Text('\$${product.price.toStringAsFixed(2)} - Stock: ${product.stock}'),
+                  subtitle: Text(
+                    '\$${product.price.toStringAsFixed(2)} - Stock: ${product.stock}',
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit),
-                        onPressed: () => _showEditProductDialog(context, product),
+                        onPressed: () =>
+                            _showEditProductDialog(context, product),
                         tooltip: 'Editar',
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () => _confirmDeleteProduct(context, product),
+                        onPressed: () =>
+                            _confirmDeleteProduct(context, product),
                         tooltip: 'Eliminar',
                       ),
                     ],
@@ -265,24 +158,32 @@ class _ProductsTabState extends State<ProductsTab> {
   void _confirmDeleteProduct(BuildContext context, Product product) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Eliminar Producto'),
-        content: Text('¿Estás seguro de que quieres eliminar "${product.name}"?'),
+        content: Text(
+          '¿Estás seguro de que quieres eliminar "${product.name}"?',
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop();
-              final productProvider = Provider.of<ProductProvider>(context, listen: false);
+              Navigator.of(dialogContext).pop();
+              final productProvider = Provider.of<ProductProvider>(
+                context,
+                listen: false,
+              );
               final success = await productProvider.deleteProduct(product.id);
-              if (success && mounted) {
+              if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Producto eliminado'), duration: Duration(seconds: 2)),
+                  const SnackBar(
+                    content: Text('Producto eliminado'),
+                    duration: Duration(seconds: 2),
+                  ),
                 );
-              } else if (mounted) {
+              } else if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Error al eliminar producto'),
@@ -386,10 +287,17 @@ class _UsersTabState extends State<UsersTab> {
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value.startsWith('role_')) {
-                        final newRole = value.substring(5); // Remove 'role_' prefix
+                        final newRole = value.substring(
+                          5,
+                        ); // Remove 'role_' prefix
                         _changeUserRole(context, userId, newRole, name);
                       } else if (value == 'block') {
-                        _toggleUserBlock(context, userId, name, userData['isBlocked'] == true);
+                        _toggleUserBlock(
+                          context,
+                          userId,
+                          name,
+                          userData['isBlocked'] == true,
+                        );
                       } else if (value == 'delete') {
                         _confirmDeleteUser(context, userId, name);
                       }
@@ -410,12 +318,19 @@ class _UsersTabState extends State<UsersTab> {
                       const PopupMenuDivider(),
                       PopupMenuItem(
                         value: 'block',
-                        child: Text(userData['isBlocked'] == true ? '🔓 Desbloquear Usuario' : '🔒 Bloquear Usuario'),
+                        child: Text(
+                          userData['isBlocked'] == true
+                              ? '🔓 Desbloquear Usuario'
+                              : '🔒 Bloquear Usuario',
+                        ),
                       ),
                       const PopupMenuDivider(),
                       const PopupMenuItem(
                         value: 'delete',
-                        child: Text('🗑️ Eliminar Usuario', style: TextStyle(color: Colors.red)),
+                        child: Text(
+                          '🗑️ Eliminar Usuario',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ),
                     ],
                   ),
@@ -454,23 +369,29 @@ class _UsersTabState extends State<UsersTab> {
     }
   }
 
-  void _changeUserRole(BuildContext context, String userId, String newRole, String userName) async {
+  void _changeUserRole(
+    BuildContext context,
+    String userId,
+    String newRole,
+    String userName,
+  ) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'role': newRole});
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'role': newRole,
+      });
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Rol de $userName cambiado a ${_getRoleDisplayName(newRole)}'),
+            content: Text(
+              'Rol de $userName cambiado a ${_getRoleDisplayName(newRole)}',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al cambiar rol: $e'),
@@ -482,29 +403,37 @@ class _UsersTabState extends State<UsersTab> {
     }
   }
 
-  void _toggleUserBlock(BuildContext context, String userId, String userName, bool isCurrentlyBlocked) async {
+  void _toggleUserBlock(
+    BuildContext context,
+    String userId,
+    String userName,
+    bool isCurrentlyBlocked,
+  ) async {
     try {
       final newBlockedStatus = !isCurrentlyBlocked;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'isBlocked': newBlockedStatus});
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'isBlocked': newBlockedStatus,
+      });
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(newBlockedStatus
-                ? '$userName ha sido bloqueado'
-                : '$userName ha sido desbloqueado'),
+            content: Text(
+              newBlockedStatus
+                  ? '$userName ha sido bloqueado'
+                  : '$userName ha sido desbloqueado',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al ${isCurrentlyBlocked ? 'desbloquear' : 'bloquear'} usuario: $e'),
+            content: Text(
+              'Error al ${isCurrentlyBlocked ? 'desbloquear' : 'bloquear'} usuario: $e',
+            ),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -513,20 +442,26 @@ class _UsersTabState extends State<UsersTab> {
     }
   }
 
-  void _confirmDeleteUser(BuildContext context, String userId, String userName) {
+  void _confirmDeleteUser(
+    BuildContext context,
+    String userId,
+    String userName,
+  ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Eliminar Usuario'),
-        content: Text('¿Estás seguro de que quieres eliminar permanentemente al usuario "$userName"? Esta acción no se puede deshacer.'),
+        content: Text(
+          '¿Estás seguro de que quieres eliminar permanentemente al usuario "$userName"? Esta acción no se puede deshacer.',
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               await _deleteUser(context, userId, userName);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -537,14 +472,15 @@ class _UsersTabState extends State<UsersTab> {
     );
   }
 
-  Future<void> _deleteUser(BuildContext context, String userId, String userName) async {
+  Future<void> _deleteUser(
+    BuildContext context,
+    String userId,
+    String userName,
+  ) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .delete();
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Usuario $userName eliminado permanentemente'),
@@ -554,7 +490,7 @@ class _UsersTabState extends State<UsersTab> {
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al eliminar usuario: $e'),
@@ -584,7 +520,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   final _stockController = TextEditingController();
   final _categoryController = TextEditingController();
 
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   List<String> _existingImageUrls = [];
   bool _isLoading = false;
 
@@ -696,12 +632,14 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                   ),
                   const SizedBox(height: 8),
                   // Mostrar imágenes existentes
-                  if (_existingImageUrls.isNotEmpty || _selectedImages.isNotEmpty)
+                  if (_existingImageUrls.isNotEmpty ||
+                      _selectedImages.isNotEmpty)
                     SizedBox(
                       height: 120,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: _existingImageUrls.length + _selectedImages.length,
+                        itemCount:
+                            _existingImageUrls.length + _selectedImages.length,
                         itemBuilder: (context, index) {
                           if (index < _existingImageUrls.length) {
                             // Imagen existente
@@ -714,15 +652,23 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                     width: 80,
                                     height: 80,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.image_not_supported, size: 80),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                              Icons.image_not_supported,
+                                              size: 80,
+                                            ),
                                   ),
                                   Positioned(
                                     top: 0,
                                     right: 0,
                                     child: IconButton(
-                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
-                                      onPressed: () => _removeExistingImage(index),
+                                      icon: const Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () =>
+                                          _removeExistingImage(index),
                                       iconSize: 20,
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
@@ -733,7 +679,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             );
                           } else {
                             // Nueva imagen seleccionada
-                            final newImageIndex = index - _existingImageUrls.length;
+                            final newImageIndex =
+                                index - _existingImageUrls.length;
                             return Padding(
                               padding: const EdgeInsets.all(4),
                               child: Stack(
@@ -748,8 +695,12 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                                     top: 0,
                                     right: 0,
                                     child: IconButton(
-                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
-                                      onPressed: () => _removeNewImage(newImageIndex),
+                                      icon: const Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () =>
+                                          _removeNewImage(newImageIndex),
                                       iconSize: 20,
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
@@ -793,7 +744,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
     if (pickedFiles.isNotEmpty) {
       setState(() {
-        _selectedImages.addAll(pickedFiles.map((file) => File(file.path)).toList());
+        _selectedImages.addAll(
+          pickedFiles.map((file) => File(file.path)).toList(),
+        );
       });
     }
   }
@@ -816,11 +769,16 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     setState(() => _isLoading = true);
 
     try {
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      );
       final storageService = StorageService();
 
       // Combinar imágenes existentes con nuevas
-      List<String> imageUrls = List.from(_existingImageUrls); // Mantener imágenes existentes no eliminadas
+      List<String> imageUrls = List.from(
+        _existingImageUrls,
+      ); // Mantener imágenes existentes no eliminadas
 
       bool success;
       String finalProductId;
@@ -895,19 +853,24 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           updatedAt: DateTime.now(),
         );
 
-        success = await productProvider.updateProduct(finalProductId, finalProduct);
+        success = await productProvider.updateProduct(
+          finalProductId,
+          finalProduct,
+        );
       }
 
       if (success && mounted) {
-        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.product != null
-                ? 'Producto actualizado'
-                : 'Producto agregado'),
+            content: Text(
+              widget.product != null
+                  ? 'Producto actualizado'
+                  : 'Producto agregado',
+            ),
             duration: Duration(seconds: 2),
           ),
         );
+        Navigator.of(context).pop();
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

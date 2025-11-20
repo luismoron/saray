@@ -12,7 +12,8 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  String _selectedStatus = 'all'; // all, pending, confirmed, shipped, delivered, cancelled
+  String _selectedStatus =
+      'all'; // all, pending, confirmed, shipped, delivered, cancelled
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -116,7 +117,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text('Error: ${snapshot.error}'),
                         const SizedBox(height: 16),
@@ -129,35 +134,61 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   );
                 }
 
-                final orders = snapshot.data?.docs.map((doc) {
-                  try {
-                    final orderData = doc.data() as Map<String, dynamic>;
-                    print('DEBUG: Processing order ${doc.id}');
-                    print('DEBUG: Order data keys: ${orderData.keys.toList()}');
-                    final order = my_order.Order.fromFirestore(orderData, doc.id);
-                    print('DEBUG: Order created successfully: ${order.id}');
-                    return order;
-                  } catch (e, stackTrace) {
-                    print('ERROR: Failed to parse order ${doc.id}: $e');
-                    print('ERROR: Stack trace: $stackTrace');
-                    // Return null for failed orders, we'll filter them out
-                    return null;
-                  }
-                }).where((order) => order != null).cast<my_order.Order>().toList() ?? [];
+                final orders =
+                    snapshot.data?.docs
+                        .map((doc) {
+                          try {
+                            final orderData =
+                                doc.data() as Map<String, dynamic>;
+                            debugPrint('DEBUG: Processing order ${doc.id}');
+                            debugPrint(
+                              'DEBUG: Order data keys: ${orderData.keys.toList()}',
+                            );
+                            final order = my_order.Order.fromFirestore(
+                              orderData,
+                              doc.id,
+                            );
+                            debugPrint(
+                              'DEBUG: Order created successfully: ${order.id}',
+                            );
+                            return order;
+                          } catch (e, stackTrace) {
+                            debugPrint(
+                              'ERROR: Failed to parse order ${doc.id}: $e',
+                            );
+                            debugPrint('ERROR: Stack trace: $stackTrace');
+                            // Return null for failed orders, we'll filter them out
+                            return null;
+                          }
+                        })
+                        .where((order) => order != null)
+                        .cast<my_order.Order>()
+                        .toList() ??
+                    [];
 
                 // Ordenar por fecha de creación (descendente) en cliente
                 orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
                 // Filtrar por búsqueda si hay texto
                 final filteredOrders = _searchController.text.isNotEmpty
-                    ? orders.where((order) =>
-                        order.id.toLowerCase().contains(_searchController.text.toLowerCase())).toList()
+                    ? orders
+                          .where(
+                            (order) => order.id.toLowerCase().contains(
+                              _searchController.text.toLowerCase(),
+                            ),
+                          )
+                          .toList()
                     : orders;
 
                 // Aplicar filtro de estado en cliente si no es 'all'
                 final finalFilteredOrders = _selectedStatus != 'all'
-                    ? filteredOrders.where((order) =>
-                        order.status.toString().split('.').last == _selectedStatus).toList()
+                    ? filteredOrders
+                          .where(
+                            (order) =>
+                                order.status.toString().split('.').last ==
+                                _selectedStatus,
+                          )
+                          .toList()
                     : filteredOrders;
 
                 if (finalFilteredOrders.isEmpty) {
@@ -166,7 +197,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          _searchController.text.isNotEmpty ? Icons.search_off : Icons.shopping_bag_outlined,
+                          _searchController.text.isNotEmpty
+                              ? Icons.search_off
+                              : Icons.shopping_bag_outlined,
                           size: 64,
                           color: Colors.grey,
                         ),
@@ -182,9 +215,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           const SizedBox(height: 8),
                           Text(
                             'con estado "${_getStatusDisplayName(_selectedStatus)}"',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.grey),
                           ),
                         ],
                       ],
@@ -200,13 +232,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     try {
                       return _buildOrderCard(context, order);
                     } catch (e, stackTrace) {
-                      print('ERROR: Failed to build order card for ${order.id}: $e');
-                      print('ERROR: Stack trace: $stackTrace');
+                      debugPrint(
+                        'ERROR: Failed to build order card for ${order.id}: $e',
+                      );
+                      debugPrint('ERROR: Stack trace: $stackTrace');
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Text('Error al mostrar pedido ${order.id.substring(0, 8).toUpperCase()}'),
+                          child: Text(
+                            'Error al mostrar pedido ${order.id.substring(0, 8).toUpperCase()}',
+                          ),
                         ),
                       );
                     }
@@ -237,9 +273,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => _showOrderDetails(context, order),
@@ -273,9 +307,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withOpacity(0.3)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -283,7 +317,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     Icon(statusIcon, size: 16, color: statusColor),
                     const SizedBox(width: 4),
                     Text(
-                      _getStatusDisplayName(order.status.toString().split('.').last),
+                      _getStatusDisplayName(
+                        order.status.toString().split('.').last,
+                      ),
                       style: TextStyle(
                         color: statusColor,
                         fontWeight: FontWeight.w500,
@@ -310,10 +346,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         const SizedBox(height: 4),
                         Text(
                           'Total: \$${order.total.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),
@@ -337,17 +374,24 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('Filtrar por Estado'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildFilterOption('all', 'Todos los pedidos'),
-            _buildFilterOption('pending', 'Pendientes'),
-            _buildFilterOption('confirmed', 'Confirmados'),
-            _buildFilterOption('preparing', 'En preparación'),
-            _buildFilterOption('shipped', 'Enviados'),
-            _buildFilterOption('delivered', 'Entregados'),
-            _buildFilterOption('cancelled', 'Cancelados'),
-          ],
+        content: RadioGroup<String>(
+          groupValue: _selectedStatus,
+          onChanged: (value) {
+            setState(() => _selectedStatus = value!);
+            Navigator.of(context).pop();
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildFilterOption('all', 'Todos los pedidos'),
+              _buildFilterOption('pending', 'Pendientes'),
+              _buildFilterOption('confirmed', 'Confirmados'),
+              _buildFilterOption('preparing', 'En preparación'),
+              _buildFilterOption('shipped', 'Enviados'),
+              _buildFilterOption('delivered', 'Entregados'),
+              _buildFilterOption('cancelled', 'Cancelados'),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -363,11 +407,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return RadioListTile<String>(
       title: Text(label),
       value: status,
-      groupValue: _selectedStatus,
-      onChanged: (value) {
-        setState(() => _selectedStatus = value!);
-        Navigator.of(context).pop();
-      },
       dense: true,
     );
   }
@@ -375,132 +414,167 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   void _showOrderDetails(BuildContext context, my_order.Order order) {
     try {
       showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Pedido #${order.id.substring(0, 8).toUpperCase()}',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-
-              const Divider(),
-
-              // Información del pedido
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (BuildContext context) => DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          builder: (context, scrollController) => Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildDetailRow('Estado', _getStatusDisplayName(order.status.toString().split('.').last)),
-                    _buildDetailRow('Fecha', '${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year} ${order.createdAt.hour}:${order.createdAt.minute.toString().padLeft(2, '0')}'),
-                    _buildDetailRow('Total', '\$${order.total.toStringAsFixed(2)}'),
-                    _buildDetailRow('Dirección', order.deliveryAddress),
-                    _buildDetailRow('Teléfono', order.phoneNumber),
-                    if (order.notes != null && order.notes!.isNotEmpty)
-                      _buildDetailRow('Notas', order.notes!),
-
-                    const SizedBox(height: 20),
-
-                    // Productos
                     Text(
-                      'Productos',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      'Pedido #${order.id.substring(0, 8).toUpperCase()}',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 12),
-
-                    ...order.items.map((item) => Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            // Imagen del producto (placeholder por ahora)
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: item.product.imageUrls.isNotEmpty
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        item.product.imageUrls.first,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                            const Icon(Icons.image_not_supported),
-                                      ),
-                                    )
-                                  : const Icon(Icons.inventory_2),
-                            ),
-
-                            const SizedBox(width: 12),
-
-                            // Información del producto
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.product.name.isNotEmpty ? item.product.name : 'Producto sin nombre',
-                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Cantidad: ${item.quantity}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Precio: \$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )).toList(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ],
                 ),
-              ),
-            ],
+
+                const Divider(),
+
+                // Información del pedido
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      _buildDetailRow(
+                        'Estado',
+                        _getStatusDisplayName(
+                          order.status.toString().split('.').last,
+                        ),
+                      ),
+                      _buildDetailRow(
+                        'Fecha',
+                        '${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year} ${order.createdAt.hour}:${order.createdAt.minute.toString().padLeft(2, '0')}',
+                      ),
+                      _buildDetailRow(
+                        'Total',
+                        '\$${order.total.toStringAsFixed(2)}',
+                      ),
+                      _buildDetailRow('Dirección', order.deliveryAddress),
+                      _buildDetailRow('Teléfono', order.phoneNumber),
+                      if (order.notes != null && order.notes!.isNotEmpty)
+                        _buildDetailRow('Notas', order.notes!),
+
+                      const SizedBox(height: 20),
+
+                      // Productos
+                      Text(
+                        'Productos',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+
+                      ...order.items
+                          .map(
+                            (item) => Card(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    // Imagen del producto (placeholder por ahora)
+                                    Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: item.product.imageUrls.isNotEmpty
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.network(
+                                                item.product.imageUrls.first,
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) => const Icon(
+                                                      Icons.image_not_supported,
+                                                    ),
+                                              ),
+                                            )
+                                          : const Icon(Icons.inventory_2),
+                                    ),
+
+                                    const SizedBox(width: 12),
+
+                                    // Información del producto
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.product.name.isNotEmpty
+                                                ? item.product.name
+                                                : 'Producto sin nombre',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                          ),
+                                          Text(
+                                            'Cantidad: ${item.quantity}',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                          ),
+                                          Text(
+                                            'Precio: \$${(item.product.price * item.quantity).toStringAsFixed(2)}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          ,
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
     } catch (e, stackTrace) {
-      print('ERROR: Failed to show order details for ${order.id}: $e');
-      print('ERROR: Stack trace: $stackTrace');
+      debugPrint('ERROR: Failed to show order details for ${order.id}: $e');
+      debugPrint('ERROR: Stack trace: $stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al mostrar detalles del pedido: $e')),
       );
@@ -520,9 +594,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 
 class ProductService {
@@ -11,10 +12,10 @@ class ProductService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Product.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Product.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Obtener productos por categoría
@@ -25,10 +26,10 @@ class ProductService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Product.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Product.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Buscar productos por nombre
@@ -40,10 +41,10 @@ class ProductService {
         .orderBy('name')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Product.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Product.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Obtener producto por ID
@@ -55,7 +56,7 @@ class ProductService {
       }
       return null;
     } catch (e) {
-      print('Error getting product: $e');
+      debugPrint('Error getting product: $e');
       return null;
     }
   }
@@ -72,7 +73,7 @@ class ProductService {
           .toList();
       return categories;
     } catch (e) {
-      print('Error getting categories: $e');
+      debugPrint('Error getting categories: $e');
       return [];
     }
   }
@@ -80,10 +81,12 @@ class ProductService {
   // Agregar producto (para admins)
   Future<String?> addProduct(Product product) async {
     try {
-      final docRef = await _firestore.collection('products').add(product.toFirestore());
+      final docRef = await _firestore
+          .collection('products')
+          .add(product.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error adding product: $e');
+      debugPrint('Error adding product: $e');
       return null;
     }
   }
@@ -91,10 +94,13 @@ class ProductService {
   // Actualizar producto (para admins)
   Future<bool> updateProduct(String productId, Product product) async {
     try {
-      await _firestore.collection('products').doc(productId).update(product.toFirestore());
+      await _firestore
+          .collection('products')
+          .doc(productId)
+          .update(product.toFirestore());
       return true;
     } catch (e) {
-      print('Error updating product: $e');
+      debugPrint('Error updating product: $e');
       return false;
     }
   }
@@ -105,7 +111,7 @@ class ProductService {
       await _firestore.collection('products').doc(productId).delete();
       return true;
     } catch (e) {
-      print('Error deleting product: $e');
+      debugPrint('Error deleting product: $e');
       return false;
     }
   }

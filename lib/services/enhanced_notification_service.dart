@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
 class EnhancedNotificationService {
-  static final EnhancedNotificationService _instance = EnhancedNotificationService._internal();
+  static final EnhancedNotificationService _instance =
+      EnhancedNotificationService._internal();
   factory EnhancedNotificationService() => _instance;
   EnhancedNotificationService._internal();
 
-  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   void initialize(BuildContext context) {
     // Este método debe llamarse en el MaterialApp para obtener el contexto
   }
 
-  GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey => _scaffoldMessengerKey;
+  GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey =>
+      _scaffoldMessengerKey;
 
   // Notificación de éxito con animación
   void showSuccessNotification({
@@ -100,7 +103,9 @@ class EnhancedNotificationService {
       message: 'Pedido #$orderId por \$${total.toStringAsFixed(2)}',
       backgroundColor: Colors.green.shade700,
       icon: Icons.shopping_cart,
-      duration: const Duration(seconds: 3), // Más tiempo para confirmaciones importantes
+      duration: const Duration(
+        seconds: 3,
+      ), // Más tiempo para confirmaciones importantes
       onAction: onViewOrder,
       actionLabel: 'Ver Pedido',
     );
@@ -161,11 +166,14 @@ class EnhancedNotificationService {
       backgroundColor: Colors.transparent,
       elevation: 0,
       duration: duration,
-      behavior: SnackBarBehavior.floating, // Usar floating para poder usar margin
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: const EdgeInsets.only(left: 8, right: 8, bottom: 16), // Margen inferior agregado
+      behavior:
+          SnackBarBehavior.floating, // Usar floating para poder usar margin
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(
+        left: 8,
+        right: 8,
+        bottom: 16,
+      ), // Margen inferior agregado
       padding: EdgeInsets.zero, // Sin padding extra
     );
 
@@ -206,13 +214,16 @@ class EnhancedSnackBarContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity, // Forzar ancho completo
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10), // Reducido para más espacio
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 10,
+      ), // Reducido para más espacio
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -335,21 +346,14 @@ class _ToastNotificationState extends State<ToastNotification>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
 
     _animationController.forward();
   }
@@ -364,7 +368,7 @@ class _ToastNotificationState extends State<ToastNotification>
   Widget build(BuildContext context) {
     return Positioned(
       top: MediaQuery.of(context).padding.top + 16,
-      left: 0,  // Cambiado a 0 para ocupar todo el ancho
+      left: 0, // Cambiado a 0 para ocupar todo el ancho
       right: 0, // Cambiado a 0 para ocupar todo el ancho
       child: SlideTransition(
         position: _slideAnimation,
@@ -373,14 +377,16 @@ class _ToastNotificationState extends State<ToastNotification>
           child: Material(
             color: Colors.transparent,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8), // Margen pequeño para no tocar los bordes
+              margin: const EdgeInsets.symmetric(
+                horizontal: 8,
+              ), // Margen pequeño para no tocar los bordes
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -388,13 +394,10 @@ class _ToastNotificationState extends State<ToastNotification>
               ),
               child: Row(
                 children: [
-                  Icon(
-                    widget.icon,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  Icon(widget.icon, color: Colors.white, size: 24),
                   const SizedBox(width: 12),
-                  Expanded(  // Asegurar que tome todo el espacio disponible
+                  Expanded(
+                    // Asegurar que tome todo el espacio disponible
                     child: Text(
                       widget.message,
                       style: const TextStyle(

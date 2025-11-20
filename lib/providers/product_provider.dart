@@ -38,7 +38,7 @@ class ProductProvider with ChangeNotifier {
         notifyListeners();
       });
     } catch (e) {
-      print('Error loading products: $e');
+      debugPrint('Error loading products: $e');
       _isLoading = false;
       notifyListeners();
     }
@@ -50,7 +50,7 @@ class ProductProvider with ChangeNotifier {
       _categories = await _productService.getCategories();
       notifyListeners();
     } catch (e) {
-      print('Error loading categories: $e');
+      debugPrint('Error loading categories: $e');
     }
   }
 
@@ -79,17 +79,24 @@ class ProductProvider with ChangeNotifier {
 
     // Filtrar por búsqueda
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((product) =>
-          product.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().contains(_searchQuery.toLowerCase())
-      ).toList();
+      filtered = filtered
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                product.description.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
     }
 
     // Filtrar por categoría
     if (_selectedCategory.isNotEmpty) {
-      filtered = filtered.where((product) =>
-          product.category == _selectedCategory
-      ).toList();
+      filtered = filtered
+          .where((product) => product.category == _selectedCategory)
+          .toList();
     }
 
     _filteredProducts = filtered;

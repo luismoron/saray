@@ -18,17 +18,17 @@ class AuthProvider with ChangeNotifier {
   bool get isInitialized => _isInitialized;
 
   AuthProvider() {
-    print('AuthProvider constructor called');
+    debugPrint('AuthProvider constructor called');
     _init();
   }
 
   void _init() {
-    print('AuthProvider _init called');
+    debugPrint('AuthProvider _init called');
     _authService.authStateChanges.listen(_onAuthStateChanged);
   }
 
   void _onAuthStateChanged(auth.User? firebaseUser) async {
-    print('AuthStateChanged called with user: ${firebaseUser?.email}');
+    debugPrint('AuthStateChanged called with user: ${firebaseUser?.email}');
     _firebaseUser = firebaseUser;
     if (firebaseUser != null) {
       _user = await _authService.getUserData(firebaseUser.uid);
@@ -36,19 +36,19 @@ class AuthProvider with ChangeNotifier {
       _user = null;
     }
     _isInitialized = true;
-    print('AuthProvider initialized: $_isInitialized');
+    debugPrint('AuthProvider initialized: $_isInitialized');
     notifyListeners();
   }
 
   Future<void> register(String email, String password, String name) async {
-    print('Register started for $email');
+    debugPrint('Register started for $email');
     _isLoading = true;
     notifyListeners();
     try {
       await _authService.registerWithEmailAndPassword(email, password, name);
-      print('Register success for $email');
+      debugPrint('Register success for $email');
     } catch (e) {
-      print('Register error: $e');
+      debugPrint('Register error: $e');
       _isLoading = false;
       notifyListeners();
       rethrow;
@@ -80,15 +80,13 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Método temporal para asignar rol admin (desarrollo)
-  // TODO: Remover después de asignar admin inicial
   Future<bool> assignAdminRole() async {
     if (user == null) return false;
 
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.id)
-          .update({'role': 'admin'});
+      await FirebaseFirestore.instance.collection('users').doc(user!.id).update(
+        {'role': 'admin'},
+      );
 
       // Actualizar usuario local
       final updatedUser = user!.copyWith(role: 'admin');
@@ -97,7 +95,7 @@ class AuthProvider with ChangeNotifier {
 
       return true;
     } catch (e) {
-      print('Error assigning admin role: $e');
+      debugPrint('Error assigning admin role: $e');
       return false;
     }
   }

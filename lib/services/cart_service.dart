@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/cart_item.dart';
 
 class CartService {
@@ -13,17 +14,20 @@ class CartService {
         .orderBy('addedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return CartItem.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return CartItem.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Agregar producto al carrito
   Future<String?> addToCart(String userId, CartItem cartItem) async {
     try {
       // Verificar si el producto ya está en el carrito
-      final existingItem = await _getCartItemByProductId(userId, cartItem.product.id);
+      final existingItem = await _getCartItemByProductId(
+        userId,
+        cartItem.product.id,
+      );
 
       if (existingItem != null) {
         // Si existe, actualizar cantidad
@@ -40,13 +44,17 @@ class CartService {
         return docRef.id;
       }
     } catch (e) {
-      print('Error adding to cart: $e');
+      debugPrint('Error adding to cart: $e');
       return null;
     }
   }
 
   // Actualizar cantidad de un item del carrito
-  Future<bool> updateCartItemQuantity(String userId, String cartItemId, int quantity) async {
+  Future<bool> updateCartItemQuantity(
+    String userId,
+    String cartItemId,
+    int quantity,
+  ) async {
     try {
       if (quantity <= 0) {
         // Si cantidad es 0 o menor, eliminar el item
@@ -61,7 +69,7 @@ class CartService {
           .update({'quantity': quantity});
       return true;
     } catch (e) {
-      print('Error updating cart item: $e');
+      debugPrint('Error updating cart item: $e');
       return false;
     }
   }
@@ -77,7 +85,7 @@ class CartService {
           .delete();
       return true;
     } catch (e) {
-      print('Error removing from cart: $e');
+      debugPrint('Error removing from cart: $e');
       return false;
     }
   }
@@ -98,13 +106,16 @@ class CartService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error clearing cart: $e');
+      debugPrint('Error clearing cart: $e');
       return false;
     }
   }
 
   // Obtener item del carrito por productId
-  Future<CartItem?> _getCartItemByProductId(String userId, String productId) async {
+  Future<CartItem?> _getCartItemByProductId(
+    String userId,
+    String productId,
+  ) async {
     try {
       final snapshot = await _firestore
           .collection('users')
@@ -120,7 +131,7 @@ class CartService {
       }
       return null;
     } catch (e) {
-      print('Error getting cart item: $e');
+      debugPrint('Error getting cart item: $e');
       return null;
     }
   }
@@ -141,7 +152,7 @@ class CartService {
       }
       return total;
     } catch (e) {
-      print('Error calculating cart total: $e');
+      debugPrint('Error calculating cart total: $e');
       return 0;
     }
   }

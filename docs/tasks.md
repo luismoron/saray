@@ -79,6 +79,8 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Try-catch en detalles de pedido con SnackBars informativos.
   - [x] Validaciones de datos nulos en productos y pedidos.
   - [x] Solución de problemas de índices de Firestore.
+  - [x] Corregir uso de BuildContext en gaps asíncronos.
+  - [x] Reemplazar print con debugPrint para logging seguro.
 
 ## 4. Diseño de UI/UX
 

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
@@ -14,16 +15,21 @@ class AuthService {
 
   // Registro con email y contraseña
   Future<auth.UserCredential> registerWithEmailAndPassword(
-      String email, String password, String name) async {
-    print('AuthService: Starting register for $email');
+    String email,
+    String password,
+    String name,
+  ) async {
+    debugPrint('AuthService: Starting register for $email');
     try {
       auth.UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
       auth.User? user = result.user;
-      print('AuthService: User created: ${user?.email}');
+      debugPrint('AuthService: User created: ${user?.email}');
 
       if (user != null) {
-        print('AuthService: Saving to Firestore for ${user.uid}');
+        debugPrint('AuthService: Saving to Firestore for ${user.uid}');
         await _firestore.collection('users').doc(user.uid).set({
           'id': user.uid,
           'name': name,
@@ -31,22 +37,26 @@ class AuthService {
           'role': 'buyer',
           'createdAt': FieldValue.serverTimestamp(),
         });
-        print('AuthService: Firestore save success');
+        debugPrint('AuthService: Firestore save success');
       }
 
       return result;
     } catch (e) {
-      print('AuthService: Register error: $e');
+      debugPrint('AuthService: Register error: $e');
       rethrow;
     }
   }
 
   // Login con email y contraseña
   Future<auth.UserCredential> signInWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       return await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
     } catch (e) {
       rethrow;
     }
@@ -65,8 +75,10 @@ class AuthService {
   // Obtener datos del usuario desde Firestore
   Future<User?> getUserData(String uid) async {
     try {
-      DocumentSnapshot doc =
-          await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
       if (doc.exists) {
         return User.fromJson(doc.data() as Map<String, dynamic>);
       }

@@ -1,7 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/order.dart' as order_model;
-import '../models/cart_item.dart';
-import '../models/product.dart';
 
 void testOrderConversion() async {
   // Simular datos de Firestore como los que se guardarían
@@ -23,7 +22,7 @@ void testOrderConversion() async {
         'productId': 'test-product-id',
         'quantity': 2,
         'addedAt': Timestamp.now(),
-      }
+      },
     ],
     'total': 20.0,
     'status': 'pending',
@@ -35,15 +34,18 @@ void testOrderConversion() async {
   };
 
   try {
-    print('Testing Order.fromFirestore...');
-    final order = order_model.Order.fromFirestore(mockOrderData, 'test-order-id');
-    print('SUCCESS: Order created successfully');
-    print('Order ID: ${order.id}');
-    print('Order Status: ${order.status}');
-    print('Order Total: ${order.total}');
-    print('Order Items Count: ${order.items.length}');
+    debugPrint('Testing Order.fromFirestore...');
+    final order = order_model.Order.fromFirestore(
+      mockOrderData,
+      'test-order-id',
+    );
+    debugPrint('SUCCESS: Order created successfully');
+    debugPrint('Order ID: ${order.id}');
+    debugPrint('Order Status: ${order.status}');
+    debugPrint('Order Total: ${order.total}');
+    debugPrint('Order Items Count: ${order.items.length}');
   } catch (e, stackTrace) {
-    print('ERROR: Failed to create order: $e');
-    print('Stack Trace: $stackTrace');
+    debugPrint('ERROR: Failed to create order: $e');
+    debugPrint('Stack Trace: $stackTrace');
   }
 }

@@ -71,20 +71,20 @@ class _NotificationCenterState extends State<NotificationCenter> {
           Icon(
             Icons.notifications_none,
             size: 64,
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             'No tienes notificaciones',
             style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Las nuevas notificaciones aparecerán aquí',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             textAlign: TextAlign.center,
           ),
@@ -104,7 +104,10 @@ class _NotificationCenterState extends State<NotificationCenter> {
     );
   }
 
-  Widget _buildNotificationCard(Map<String, dynamic> notification, ThemeData theme) {
+  Widget _buildNotificationCard(
+    Map<String, dynamic> notification,
+    ThemeData theme,
+  ) {
     final isRead = notification['read'] as bool;
     final type = notification['type'] as String;
 
@@ -144,11 +147,7 @@ class _NotificationCenterState extends State<NotificationCenter> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: _getIconColor(type),
-                size: 24,
-              ),
+              Icon(icon, color: _getIconColor(type), size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -182,14 +181,18 @@ class _NotificationCenterState extends State<NotificationCenter> {
                     Text(
                       notification['message'],
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.8,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _formatTimestamp(notification['timestamp'] as DateTime),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ],
@@ -257,7 +260,8 @@ class _NotificationCenterState extends State<NotificationCenter> {
     // Mostrar diferentes tipos de notificaciones para probar
     Future.delayed(const Duration(milliseconds: 500), () {
       EnhancedNotificationService().showSuccessNotification(
-        message: '¡Notificación de éxito! Esta notificación se oculta automáticamente en 2 segundos.',
+        message:
+            '¡Notificación de éxito! Esta notificación se oculta automáticamente en 2 segundos.',
       );
     });
 

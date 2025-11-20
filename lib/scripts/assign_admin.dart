@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Script temporal para asignar rol de admin a un usuario
@@ -8,27 +9,26 @@ Future<void> assignAdminRole(String userEmail) async {
     final userQuery = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: userEmail)
+        .limit(1)
         .get();
 
     if (userQuery.docs.isEmpty) {
-      print('Usuario con email $userEmail no encontrado');
+      debugPrint('Usuario con email $userEmail no encontrado');
       return;
     }
 
-    final userDoc = userQuery.docs.first;
-    final userId = userDoc.id;
+    final userId = userQuery.docs.first.id;
 
-    // Actualizar rol a admin
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .update({'role': 'admin'});
+    // Actualizar rol
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'role': 'admin',
+    });
 
-    print('✅ Rol admin asignado exitosamente a $userEmail');
-    print('ID de usuario: $userId');
-
+    debugPrint('✅ Rol admin asignado exitosamente a $userEmail');
+    debugPrint('ID de usuario: $userId');
   } catch (e) {
-    print('❌ Error al asignar rol admin: $e');
+    // ignore: avoid_print
+    debugPrint('❌ Error al asignar rol admin: $e');
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/order.dart' as order_model;
 
 class OrderService {
@@ -7,14 +8,16 @@ class OrderService {
   // Crear un nuevo pedido
   Future<String?> createOrder(order_model.Order order) async {
     try {
-      final docRef = await _firestore.collection('orders').add(order.toFirestore());
+      final docRef = await _firestore
+          .collection('orders')
+          .add(order.toFirestore());
 
       // Actualizar stock de productos
       await updateProductStock(order);
 
       return docRef.id;
     } catch (e) {
-      print('Error creating order: $e');
+      debugPrint('Error creating order: $e');
       return null;
     }
   }
@@ -27,10 +30,10 @@ class OrderService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return order_model.Order.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return order_model.Order.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Obtener un pedido específico
@@ -42,13 +45,16 @@ class OrderService {
       }
       return null;
     } catch (e) {
-      print('Error getting order: $e');
+      debugPrint('Error getting order: $e');
       return null;
     }
   }
 
   // Actualizar estado de un pedido
-  Future<bool> updateOrderStatus(String orderId, order_model.OrderStatus status) async {
+  Future<bool> updateOrderStatus(
+    String orderId,
+    order_model.OrderStatus status,
+  ) async {
     try {
       await _firestore.collection('orders').doc(orderId).update({
         'status': status.toString().split('.').last,
@@ -56,7 +62,7 @@ class OrderService {
       });
       return true;
     } catch (e) {
-      print('Error updating order status: $e');
+      debugPrint('Error updating order status: $e');
       return false;
     }
   }
@@ -68,10 +74,10 @@ class OrderService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return order_model.Order.fromFirestore(doc.data(), doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return order_model.Order.fromFirestore(doc.data(), doc.id);
+          }).toList();
+        });
   }
 
   // Actualizar stock de productos después de crear pedido
@@ -80,7 +86,9 @@ class OrderService {
       final batch = _firestore.batch();
 
       for (final item in order.items) {
-        final productRef = _firestore.collection('products').doc(item.product.id);
+        final productRef = _firestore
+            .collection('products')
+            .doc(item.product.id);
         batch.update(productRef, {
           'stock': item.product.stock - item.quantity,
           'updatedAt': DateTime.now(),
@@ -90,7 +98,7 @@ class OrderService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error updating product stock: $e');
+      debugPrint('Error updating product stock: $e');
       return false;
     }
   }

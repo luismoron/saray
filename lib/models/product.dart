@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class Product {
   final String id;
@@ -86,11 +87,11 @@ class Product {
       try {
         return double.parse(value);
       } catch (e) {
-        print('ERROR: Failed to parse double from string: $value');
+        debugPrint('ERROR: Failed to parse double from string: $value');
         return 0.0;
       }
     }
-    print('ERROR: Unexpected type for price: ${value.runtimeType}');
+    debugPrint('ERROR: Unexpected type for price: ${value.runtimeType}');
     return 0.0;
   }
 
@@ -102,11 +103,11 @@ class Product {
       try {
         return int.parse(value);
       } catch (e) {
-        print('ERROR: Failed to parse int from string: $value');
+        debugPrint('ERROR: Failed to parse int from string: $value');
         return 0;
       }
     }
-    print('ERROR: Unexpected type for stock: ${value.runtimeType}');
+    debugPrint('ERROR: Unexpected type for stock: ${value.runtimeType}');
     return 0;
   }
 
@@ -115,7 +116,7 @@ class Product {
     if (value is List) {
       return value.map((item) => item.toString()).toList();
     }
-    print('ERROR: Unexpected type for imageUrls: ${value.runtimeType}');
+    debugPrint('ERROR: Unexpected type for imageUrls: ${value.runtimeType}');
     return [];
   }
 }

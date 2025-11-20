@@ -8,7 +8,8 @@ class NotificationService {
   NotificationService._internal();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   // Configuración inicial
   Future<void> initialize() async {
@@ -20,12 +21,14 @@ class NotificationService {
     );
 
     // Configurar notificaciones locales
-    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
     const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
@@ -47,12 +50,14 @@ class NotificationService {
     );
 
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
 
     // Obtener token FCM
     String? token = await _firebaseMessaging.getToken();
-    print('FCM Token: $token');
+    debugPrint('FCM Token: $token');
 
     // Configurar manejadores de mensajes
     FirebaseMessaging.onMessage.listen(_onMessageReceived);
@@ -72,15 +77,16 @@ class NotificationService {
     String? payload,
     int id = 0,
   }) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'saray_channel',
-      'Saray Notifications',
-      channelDescription: 'Notificaciones de la app Saray',
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-      icon: '@mipmap/ic_launcher',
-    );
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'saray_channel',
+          'Saray Notifications',
+          channelDescription: 'Notificaciones de la app Saray',
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+          icon: '@mipmap/ic_launcher',
+        );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -97,16 +103,23 @@ class NotificationService {
   }
 
   // Mostrar notificación de pedido confirmado
-  Future<void> showOrderConfirmationNotification(String orderId, double total) async {
+  Future<void> showOrderConfirmationNotification(
+    String orderId,
+    double total,
+  ) async {
     await showLocalNotification(
       title: '¡Pedido Confirmado! 🎉',
-      body: 'Tu pedido #$orderId por \$${total.toStringAsFixed(2)} ha sido confirmado.',
+      body:
+          'Tu pedido #$orderId por \$${total.toStringAsFixed(2)} ha sido confirmado.',
       payload: 'order_$orderId',
     );
   }
 
   // Mostrar notificación de oferta
-  Future<void> showOfferNotification(String productName, double discount) async {
+  Future<void> showOfferNotification(
+    String productName,
+    double discount,
+  ) async {
     await showLocalNotification(
       title: '¡Oferta Especial! 🏷️',
       body: '$productName con ${discount.toStringAsFixed(0)}% de descuento.',
@@ -125,7 +138,7 @@ class NotificationService {
 
   // Manejador cuando se recibe mensaje en primer plano
   void _onMessageReceived(RemoteMessage message) {
-    print('Mensaje recibido: ${message.notification?.title}');
+    debugPrint('Mensaje recibido: ${message.notification?.title}');
 
     if (message.notification != null) {
       showLocalNotification(
@@ -138,19 +151,23 @@ class NotificationService {
 
   // Manejador cuando se abre la app desde notificación
   void _onMessageOpenedApp(RemoteMessage message) {
-    print('App abierta desde notificación: ${message.notification?.title}');
+    debugPrint(
+      'App abierta desde notificación: ${message.notification?.title}',
+    );
     // Aquí puedes navegar a una pantalla específica según el payload
     _handleNotificationPayload(message.data['payload']);
   }
 
   // Manejador de notificación en background
-  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    print('Mensaje en background: ${message.notification?.title}');
+  static Future<void> _firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+  ) async {
+    debugPrint('Mensaje en background: ${message.notification?.title}');
   }
 
   // Manejador cuando se toca la notificación local
   void _onNotificationTapped(NotificationResponse response) {
-    print('Notificación tocada: ${response.payload}');
+    debugPrint('Notificación tocada: ${response.payload}');
     _handleNotificationPayload(response.payload);
   }
 
@@ -161,13 +178,11 @@ class NotificationService {
     if (payload.startsWith('order_')) {
       // Navegar a detalles del pedido
       String orderId = payload.substring(6);
-      print('Navegar a pedido: $orderId');
-      // TODO: Implementar navegación
+      debugPrint('Navegar a pedido: $orderId');
     } else if (payload.startsWith('offer_')) {
       // Navegar al producto en oferta
       String productName = payload.substring(6);
-      print('Navegar a oferta: $productName');
-      // TODO: Implementar navegación
+      debugPrint('Navegar a oferta: $productName');
     }
   }
 

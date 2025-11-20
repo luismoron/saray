@@ -37,9 +37,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Checkout'),
-      ),
+      appBar: AppBar(title: Text('Checkout')),
       body: _isProcessing
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -78,7 +76,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildOrderSummary(BuildContext context, CartProvider cartProvider, ThemeData theme) {
+  Widget _buildOrderSummary(
+    BuildContext context,
+    CartProvider cartProvider,
+    ThemeData theme,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -149,7 +151,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildDeliveryInfo(BuildContext context, ThemeData theme, AuthProvider authProvider) {
+  Widget _buildDeliveryInfo(
+    BuildContext context,
+    ThemeData theme,
+    AuthProvider authProvider,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -227,15 +233,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.payment,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(Icons.payment, color: theme.colorScheme.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -256,10 +259,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.check_circle,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(Icons.check_circle, color: theme.colorScheme.primary),
                 ],
               ),
             ),
@@ -299,11 +299,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildConfirmButton(BuildContext context, CartProvider cartProvider, ThemeData theme) {
+  Widget _buildConfirmButton(
+    BuildContext context,
+    CartProvider cartProvider,
+    ThemeData theme,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: cartProvider.hasItems ? () => _confirmOrder(context, cartProvider) : null,
+        onPressed: cartProvider.hasItems
+            ? () => _confirmOrder(context, cartProvider)
+            : null,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -318,7 +324,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<void> _confirmOrder(BuildContext context, CartProvider cartProvider) async {
+  Future<void> _confirmOrder(
+    BuildContext context,
+    CartProvider cartProvider,
+  ) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -363,16 +372,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             orderId: orderId,
             total: cartProvider.total,
             onViewOrder: () {
-              // TODO: Navegar a detalles del pedido cuando se implemente
               Navigator.of(context).pushNamed('/order-history');
             },
           );
 
           // Enviar notificación push
-          await NotificationService().showOrderConfirmationNotification(orderId, cartProvider.total);
+          await NotificationService().showOrderConfirmationNotification(
+            orderId,
+            cartProvider.total,
+          );
 
           // Navegar de vuelta al home
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          if (context.mounted) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
         }
       } else {
         if (context.mounted) {
@@ -382,7 +395,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       }
     } catch (e) {
-      print('Error creating order: $e');
+      debugPrint('Error creating order: $e');
       if (context.mounted) {
         EnhancedNotificationService().showErrorNotification(
           message: 'Error al procesar el pedido. Inténtalo de nuevo.',

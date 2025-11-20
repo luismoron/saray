@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 
 class CartItem {
@@ -17,8 +18,10 @@ class CartItem {
   // Constructor desde Firestore
   factory CartItem.fromFirestore(Map<String, dynamic> data, String id) {
     try {
-      print('DEBUG CartItem.fromFirestore: Processing cart item');
-      print('DEBUG CartItem.fromFirestore: Data keys: ${data.keys.toList()}');
+      debugPrint('DEBUG CartItem.fromFirestore: Processing cart item');
+      debugPrint(
+        'DEBUG CartItem.fromFirestore: Data keys: ${data.keys.toList()}',
+      );
 
       final productData = data['product'] as Map<String, dynamic>?;
       if (productData == null) {
@@ -35,8 +38,10 @@ class CartItem {
         addedAt: (data['addedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       );
     } catch (e, stackTrace) {
-      print('ERROR CartItem.fromFirestore: Failed to create cart item: $e');
-      print('ERROR CartItem.fromFirestore: Stack trace: $stackTrace');
+      debugPrint(
+        'ERROR CartItem.fromFirestore: Failed to create cart item: $e',
+      );
+      debugPrint('ERROR CartItem.fromFirestore: Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -81,11 +86,11 @@ class CartItem {
       try {
         return int.parse(value);
       } catch (e) {
-        print('ERROR: Failed to parse int from string: $value');
+        debugPrint('ERROR: Failed to parse int from string: $value');
         return 1;
       }
     }
-    print('ERROR: Unexpected type for quantity: ${value.runtimeType}');
+    debugPrint('ERROR: Unexpected type for quantity: ${value.runtimeType}');
     return 1;
   }
 }

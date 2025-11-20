@@ -11,11 +11,7 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback? onTap;
 
-  const ProductCard({
-    super.key,
-    required this.product,
-    this.onTap,
-  });
+  const ProductCard({super.key, required this.product, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +158,10 @@ class ProductCard extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () => _addToCart(context),
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
                             minimumSize: const Size(80, 32),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
@@ -203,16 +202,19 @@ class ProductCard extends StatelessWidget {
         EnhancedNotificationService().showProductAddedToCart(
           productName: product.name,
           onViewCart: () {
-            Navigator.of(context).pushNamed('/cart');
+            if (context.mounted) {
+              Navigator.of(context).pushNamed('/cart');
+            }
           },
         );
       } else {
         EnhancedNotificationService().showErrorNotification(
-          message: 'Error al agregar el producto al carrito. Inténtalo de nuevo.',
+          message:
+              'Error al agregar el producto al carrito. Inténtalo de nuevo.',
         );
       }
     } catch (e) {
-      print('Error adding to cart: $e');
+      debugPrint('Error adding to cart: $e');
       EnhancedNotificationService().showErrorNotification(
         message: 'Error al agregar el producto al carrito. Inténtalo de nuevo.',
       );

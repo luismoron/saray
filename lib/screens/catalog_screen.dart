@@ -84,9 +84,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             child: Consumer<ProductProvider>(
               builder: (context, productProvider, child) {
                 if (productProvider.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (productProvider.products.isEmpty) {
@@ -136,7 +134,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  Widget _buildSearchAndFilters(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildSearchAndFilters(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
         return Container(
@@ -145,7 +147,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             color: theme.colorScheme.surface,
             border: Border(
               bottom: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -172,8 +174,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  fillColor: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 onChanged: (value) {
                   productProvider.searchProducts(value);
@@ -208,7 +214,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         setState(() {
                           _selectedCategory = selected ? category : '';
                         });
-                        productProvider.filterByCategory(selected ? category : '');
+                        productProvider.filterByCategory(
+                          selected ? category : '',
+                        );
                       },
                     );
                   }),
@@ -238,9 +246,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         productProvider.clearFilters();
                       },
                       icon: const Icon(Icons.clear, size: 16),
-                      label: Text(l10n.clearFilters, style: const TextStyle(fontSize: 12)),
+                      label: Text(
+                        l10n.clearFilters,
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -255,7 +269,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   void _showProductDetails(BuildContext context, product) {
-    // TODO: Implementar pantalla de detalles del producto
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Detalles de ${product.name} - Próximamente'),

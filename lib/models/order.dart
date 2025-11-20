@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'cart_item.dart';
 
 enum OrderStatus {
@@ -38,32 +39,41 @@ class Order {
   // Constructor desde Firestore
   factory Order.fromFirestore(Map<String, dynamic> data, String id) {
     try {
-      print('DEBUG Order.fromFirestore: Processing order $id');
-      print('DEBUG Order.fromFirestore: Data keys: ${data.keys.toList()}');
+      debugPrint('DEBUG Order.fromFirestore: Processing order $id');
+      debugPrint('DEBUG Order.fromFirestore: Data keys: ${data.keys.toList()}');
 
-      final items = (data['items'] as List<dynamic>?)
-          ?.map((item) {
-            try {
-              return CartItem.fromFirestore(item as Map<String, dynamic>, '');
-            } catch (e) {
-              print('ERROR Order.fromFirestore: Failed to parse cart item: $e');
-              return null;
-            }
-          })
-          .where((item) => item != null)
-          .cast<CartItem>()
-          .toList() ?? [];
+      final items =
+          (data['items'] as List<dynamic>?)
+              ?.map((item) {
+                try {
+                  return CartItem.fromFirestore(
+                    item as Map<String, dynamic>,
+                    '',
+                  );
+                } catch (e) {
+                  debugPrint(
+                    'ERROR Order.fromFirestore: Failed to parse cart item: $e',
+                  );
+                  return null;
+                }
+              })
+              .where((item) => item != null)
+              .cast<CartItem>()
+              .toList() ??
+          [];
 
       final statusString = data['status'] as String?;
-      print('DEBUG Order.fromFirestore: Status string: $statusString');
+      debugPrint('DEBUG Order.fromFirestore: Status string: $statusString');
 
       final status = OrderStatus.values.firstWhere(
         (status) => status.toString().split('.').last == statusString,
         orElse: () => OrderStatus.pending,
       );
 
-      final createdAt = (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
-      final updatedAt = (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+      final createdAt =
+          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+      final updatedAt =
+          (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
 
       return Order(
         id: id,
@@ -78,8 +88,8 @@ class Order {
         updatedAt: updatedAt,
       );
     } catch (e, stackTrace) {
-      print('ERROR Order.fromFirestore: Failed to create order $id: $e');
-      print('ERROR Order.fromFirestore: Stack trace: $stackTrace');
+      debugPrint('ERROR Order.fromFirestore: Failed to create order $id: $e');
+      debugPrint('ERROR Order.fromFirestore: Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -135,11 +145,11 @@ class Order {
       try {
         return double.parse(value);
       } catch (e) {
-        print('ERROR: Failed to parse double from string: $value');
+        debugPrint('ERROR: Failed to parse double from string: $value');
         return 0.0;
       }
     }
-    print('ERROR: Unexpected type for total: ${value.runtimeType}');
+    debugPrint('ERROR: Unexpected type for total: ${value.runtimeType}');
     return 0.0;
   }
 }
