@@ -136,18 +136,45 @@ class UpdateService {
 
       // Crear intent para instalar el APK automáticamente
       try {
+        debugPrint('🔄 Iniciando instalación automática del APK...');
+
+        // Para Android moderno, usar ACTION_INSTALL_PACKAGE si está disponible
         final intent = AndroidIntent(
-          action: 'action_view',
+          action: 'android.intent.action.INSTALL_PACKAGE',
           data: 'file://${apkFile.path}',
           type: 'application/vnd.android.package-archive',
-          flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+          flags: <int>[
+            Flag.FLAG_ACTIVITY_NEW_TASK,
+            Flag.FLAG_GRANT_READ_URI_PERMISSION,
+          ],
         );
+
+        debugPrint('📱 Enviando intent de instalación: ${intent.action}');
         await intent.launch();
-        debugPrint('Intent de instalación enviado exitosamente');
+
+        debugPrint('✅ Intent de instalación enviado exitosamente');
+        debugPrint('📋 El sistema debería mostrar el diálogo de instalación automáticamente');
+
         return apkFile.path;
       } catch (e) {
-        debugPrint('Error al crear intent de instalación: $e');
-        return null;
+        debugPrint('❌ Error al crear intent de instalación automática: $e');
+
+        // Fallback: intentar con ACTION_VIEW (más compatible)
+        try {
+          debugPrint('🔄 Intentando fallback con ACTION_VIEW...');
+          final fallbackIntent = AndroidIntent(
+            action: 'android.intent.action.VIEW',
+            data: 'file://${apkFile.path}',
+            type: 'application/vnd.android.package-archive',
+            flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+          );
+          await fallbackIntent.launch();
+          debugPrint('✅ Fallback intent enviado exitosamente');
+          return apkFile.path;
+        } catch (fallbackError) {
+          debugPrint('❌ Error en fallback intent: $fallbackError');
+          return null;
+        }
       }
     } catch (e) {
       debugPrint('Error al descargar APK: $e');
@@ -193,14 +220,30 @@ class UpdateService {
     }
   }
 
-  /// Obtiene información de versión desde assets
+  /// Obtiene información de versión (primero intenta Google Drive, luego assets como fallback)
   Future<Map<String, dynamic>?> _getVersionInfo() async {
+    // Primero intentar descargar desde Google Drive
     try {
-      debugPrint('🔍 _getVersionInfo: Leyendo version.json desde assets');
+      debugPrint('🔍 _getVersionInfo: Intentando descargar version.json desde Google Drive');
 
-      // Leer el archivo desde assets
+      final response = await _dio.get(_versionInfoUrl);
+      if (response.statusCode == 200) {
+        final content = response.data.toString();
+        debugPrint('✅ _getVersionInfo: Datos obtenidos desde Google Drive: $content');
+
+        final data = json.decode(content) as Map<String, dynamic>;
+        return data;
+      }
+    } catch (e) {
+      debugPrint('⚠️ _getVersionInfo: No se pudo descargar desde Google Drive, usando fallback: $e');
+    }
+
+    // Fallback: leer desde assets
+    try {
+      debugPrint('🔍 _getVersionInfo: Usando version.json desde assets como fallback');
+
       final content = await rootBundle.loadString('version.json');
-      debugPrint('🔍 _getVersionInfo: Contenido del archivo: $content');
+      debugPrint('🔍 _getVersionInfo: Contenido desde assets: $content');
 
       final data = json.decode(content) as Map<String, dynamic>;
       debugPrint('✅ _getVersionInfo: Datos obtenidos desde assets: $data');
