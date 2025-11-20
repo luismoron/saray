@@ -49,6 +49,13 @@ dependencies:
   # HTTP requests
   http: ^1.0.0
 
+  # Update system dependencies
+  dio: ^5.0.0
+  android_intent_plus: ^5.0.0
+  package_info_plus: ^8.0.0
+  permission_handler: ^11.0.0
+  path_provider: ^2.1.0
+
   # Image caching
   cached_network_image: ^3.0.0
 

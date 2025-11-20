@@ -171,4 +171,53 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
   - [x] Ver detalles completos de un pedido.
   - [x] Verificar manejo de errores sin índices de Firestore.
 
+## 8. Sistema de Actualizaciones Automáticas (OTA)
+
+- [x] **Implementación del Servicio de Actualizaciones**:
+  - [x] Crear `UpdateService` con verificación automática de versiones desde Google Drive.
+  - [x] Implementar comparación semántica de versiones (major.minor.patch).
+  - [x] Integrar descarga automática de APK desde Google Drive.
+  - [x] Implementar instalación automática usando intents de Android.
+  - [x] Agregar manejo de permisos para instalación y almacenamiento.
+- [x] **UI de Actualizaciones**:
+  - [x] Crear `UpdateNotificationBanner` para mostrar actualizaciones disponibles.
+  - [x] Implementar `UpdateDialog` con detalles de la nueva versión y notas de cambios.
+  - [x] Agregar `UpdateProvider` para gestión de estado de actualizaciones.
+  - [x] Integrar verificación automática al iniciar la app.
+- [x] **Configuración de Google Drive**:
+  - [x] Configurar URLs de descarga directa para APK y version.json.
+  - [x] Implementar formato JSON para información de versiones.
+  - [x] Configurar permisos públicos para distribución a testers.
+- [x] **Script de Deploy Automático**:
+  - [x] Crear `deploy.bat` para construcción automática de APK.
+  - [x] Implementar copia automática a carpeta de Google Drive.
+  - [x] Agregar sincronización automática con Google Drive.
+  - [x] Optimizar para distribución a testers sin dispositivos conectados.
+- [x] **Documentación Completa**:
+  - [x] Crear `UPDATE_SETUP.md` con guía paso a paso.
+  - [x] Actualizar `README.md` con información del sistema OTA.
+  - [x] Crear `test_updates.bat` para pruebas del sistema.
+  - [x] Documentar workflow completo para testers.
+- [x] **Mejoras de UI/UX en Productos**:
+  - [x] Optimizar layout de tarjetas de productos con texto continuo.
+  - [x] Mejorar responsive design de grid de productos.
+  - [x] Eliminar sombras innecesarias para mejor rendimiento.
+  - [x] Implementar RichText para nombres y descripciones combinadas.
+- [x] **Sistema de Dependencias y Compatibilidad**:
+  - [x] Resolver problemas de compatibilidad con paquetes Android.
+  - [x] Implementar `android_intent_plus` para instalación automática.
+  - [x] Agregar manejo robusto de errores en descargas.
+  - [x] Optimizar permisos para Android moderno (API 8.0+).
+
+## 9. Mejoras Técnicas y Optimizaciones
+
+- [x] **Corrección de Errores de Linting**:
+  - [x] Resolver conflictos de nombres entre widgets.
+  - [x] Corregir imports y dependencias faltantes.
+  - [x] Optimizar uso de BuildContext en operaciones asíncronas.
+- [x] **Actualización de Documentación**:
+  - [x] Mantener docs sincronizadas con código implementado.
+  - [x] Agregar ejemplos de uso y configuración.
+  - [x] Documentar soluciones a problemas comunes.
+
 Esta lista es un punto de partida escalable. Si quieres que implemente alguna parte específica (ej. configurar Firebase o crear una pantalla), dime cuál y procedo. ¿Qué te parece esta estructura? ¿Hay algo que quieras agregar o modificar?

@@ -12,6 +12,7 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
 - **✅ Panel de Administración**: Gestión completa de productos con subida de imágenes.
 - **✅ Temas Claro/Oscuro**: Adaptable a la configuración del sistema.
 - **✅ Internacionalización**: Soporte para español e inglés.
+- **✅ Actualizaciones Automáticas**: Sistema de actualización OTA desde Google Drive con instalación automática.
 - **🔄 Próximas**: Notificaciones push, pruebas exhaustivas del carrito.
 
 ## 🛠️ Tecnologías Utilizadas
@@ -95,6 +96,41 @@ Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos
 Para información detallada sobre todas las funcionalidades implementadas, arquitectura, métricas y recomendaciones futuras, consulta:
 
 📄 **[Resumen Completo del Proyecto](docs/project_summary.md)**
+
+## ⚡ Sistema de Actualizaciones Automáticas
+
+La app incluye un sistema completo de **actualizaciones over-the-air (OTA)** que permite distribuir nuevas versiones a testers de forma segura y automática.
+
+### Características
+
+- **📱 Instalación Automática**: Un clic para actualizar, el instalador se abre automáticamente
+- **🔒 Distribución Segura**: Usa Google Drive en lugar de repositorios públicos
+- **📊 Control de Versiones**: Sistema de versiones semántico con notas de cambios
+- **🔄 Verificación Automática**: Detecta actualizaciones al iniciar la app
+- **👥 Para Testers**: Distribución privada sin exponer código en GitHub
+
+### Cómo Funciona
+
+1. **Nueva Versión**: Desarrollador sube APK y `version.json` a Google Drive
+2. **Detección**: App verifica automáticamente si hay actualizaciones
+3. **Notificación**: Muestra banner/dialog con información de la nueva versión
+4. **Instalación**: Usuario hace clic → descarga automática → instalador se abre
+5. **Confirmación**: Usuario confirma instalación (requerido por Android)
+
+### Configuración
+
+Ver [`UPDATE_SETUP.md`](UPDATE_SETUP.md) para instrucciones detalladas de configuración.
+
+### Prueba del Sistema
+
+```bash
+# Ejecutar script de prueba
+./test_updates.bat
+```
+
+**URLs configuradas:**
+- APK: `https://drive.google.com/uc?export=download&id=13gJ4dpmFoe8-4ZZ1d_KzYDiV7ZowNaMq`
+- Version JSON: `https://drive.google.com/uc?export=download&id=1NEdgg2zDL1Zr3QK6Oeos5iefTKm9eM4D`
 
 ### 🔄 **Próximas Prioridades (Fase 2)**
 

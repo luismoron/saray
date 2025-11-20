@@ -17,12 +17,13 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - **Provider**: Gestión de estado.
 - **Material Design 3**: UI/UX consistente.
 - **Internacionalización**: Soporte para español e inglés.
+- **Sistema OTA**: Actualizaciones automáticas desde Google Drive.
 
 ## Arquitectura de la App
 
-- **Modelos**: User, Product, Order, Category, CartItem.
-- **Providers**: AuthProvider, ProductProvider, CartProvider.
-- **Services**: AuthService, StorageService.
+- **Modelos**: User, Product, Order, Category, CartItem, UpdateInfo.
+- **Providers**: AuthProvider, ProductProvider, CartProvider, UpdateProvider.
+- **Services**: AuthService, StorageService, UpdateService.
 - **Screens**: Login, Register, Home, Catalog, Cart, Checkout, ResetPassword.
 - **Widgets**: Reutilizables para UI.
 - **Temas**: Claro y oscuro personalizados con paleta de colores azul-navy.
@@ -40,9 +41,10 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - **Sistema de Roles Reforzado**: Buyers solo pueden comprar, admins controlan permisos de venta. Protección de rutas con RouteGuard.
 - **Panel de Administración Expandido**: Nueva tab "Usuarios" para gestión completa de roles por parte de admins.
 - **Sistema de Roles**: Compradores por defecto, solicitud para ser vendedor con aprobación admin.
+- **Sistema de Actualizaciones Automáticas (OTA)**: Verificación automática desde Google Drive, instalación automática con intents de Android, UI nativa con banner y diálogo.
 - Permisos configurados para Android e iOS.
 
-## Avances Recientes (18 de noviembre de 2025)
+## Avances Recientes (20 de noviembre de 2025)
 
 - Completado modelo Category.
 - Configurados permisos en AndroidManifest.xml e Info.plist.
@@ -60,22 +62,43 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - Vista detallada de pedidos con productos e imágenes.
   - Solución de problemas de índices de Firestore mediante procesamiento en cliente.
   - Manejo robusto de errores con try-catch y validaciones.
+- **Sistema de Actualizaciones Automáticas (OTA) completamente implementado**:
+  - Servicio UpdateService con verificación desde Google Drive.
+  - Instalación automática usando intents de Android.
+  - UI completa: UpdateNotificationBanner y UpdateDialog.
+  - UpdateProvider para gestión de estado.
+  - Script deploy.bat optimizado para distribución a testers.
+  - Documentación completa en UPDATE_SETUP.md.
+- **Mejoras de UI/UX en productos**:
+  - Optimización de tarjetas de productos con layout continuo.
+  - Eliminación de sombras innecesarias.
+  - RichText para mejor presentación de nombres y descripciones.
 - **Mejoras de estabilidad**:
   - Manejo de errores en construcción de UI.
   - Validaciones de datos nulos.
   - Logging detallado para debugging.
+  - Resolución de conflictos de dependencias Android.
 
-## Estado de Pruebas (18 de noviembre de 2025)
+## Estado de Pruebas (20 de noviembre de 2025)
 
 - ✅ **Autenticación**: Registro, login, logout probados exitosamente.
 - ✅ **Panel de Administración**: Asignación de rol admin, gestión de productos con imágenes.
 - ✅ **Historial de Pedidos**: Navegación, filtros, búsqueda y detalles probados.
+- ✅ **Sistema OTA**: Verificación de actualizaciones, descarga e instalación automática probadas.
 - ✅ **Compilación**: App compila sin errores en Android.
 - ✅ **Manejo de Errores**: Try-catch implementado en componentes críticos.
 - 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.
 - 🔄 **Notificaciones**: Pendiente implementación.
 
 ## Roadmap de Mejoras Futuras
+
+### 🟢 FASE 1.5 - Mejoras del Sistema OTA
+
+- Dashboard de versiones para admins con control de releases
+- Notificaciones push para actualizaciones disponibles
+- Estadísticas de adopción de versiones por usuarios
+- Rollback automático en caso de versiones problemáticas
+- Compresión de APKs para descargas más rápidas
 
 ### 🟢 FASE 2 - Optimización de Rendimiento
 

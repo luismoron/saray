@@ -7,5 +7,20 @@ Si copio y te pego los errores (como diagnósticos de Dart/Flutter o cualquier o
 - Por qué ocurre el error.
 - La solución para repararlo.
 
-## Regla 2: Plataforma de la App - SOLO ANDROID - NO HACER BUILD PARA OTRAS PLATAFORMAS
-**CRÍTICO - NO OLVIDAR NUNCA:** La app "Bazar de Saray" está diseñada EXCLUSIVAMENTE para la plataforma Android. **NO se debe hacer build, configurar ni optimizar para iOS, Web, Windows, Linux o macOS bajo ninguna circunstancia.** Toda la configuración de Firebase, especialmente el SHA-1 para autenticación, puede ser complicada en Android debido a los requisitos de seguridad de Google. Las pruebas y desarrollo se centrarán únicamente en dispositivos Android. **Recordatorio permanente: Solo Android, nada más.**
+## Regla 3: Proceso de Deployment - USAR deploy.bat EXCLUSIVAMENTE
+**CRÍTICO - PROCESO OBLIGATORIO:** Para cualquier deployment, actualización o distribución de la app a testers, **DEBE usarse exclusivamente el script `deploy.bat`** ubicado en la raíz del proyecto. **NO se deben ejecutar comandos manuales de `flutter build apk --release`** ni ningún otro comando de build individual.
+
+**Proceso correcto:**
+1. Ejecutar `./deploy.bat` desde la raíz del proyecto
+2. El script automáticamente:
+   - Hace build en modo release
+   - Optimiza el APK
+   - Copia el APK a la carpeta de Google Drive configurada
+   - Prepara la distribución para testers
+
+**Prohibido:**
+- ❌ `flutter build apk --release`
+- ❌ Builds manuales de cualquier tipo
+- ❌ Copias manuales de archivos APK
+
+**Motivo:** El script `deploy.bat` incluye optimizaciones específicas, configuraciones de Google Drive y automatización completa del proceso de distribución OTA.
