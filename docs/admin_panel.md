@@ -2,7 +2,7 @@
 
 ## 📊 Resumen
 
-El panel de administración de "Bazar de Saray" es una interfaz completa para la gestión de productos y usuarios, optimizada para utilizar todo el espacio disponible y con funcionalidades avanzadas de control de usuarios.
+El panel de administración de "Saray" es una interfaz completa para la gestión de productos y usuarios, optimizada para utilizar todo el espacio disponible y con funcionalidades avanzadas de control de usuarios.
 
 ## 🏗️ Arquitectura y Estructura
 

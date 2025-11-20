@@ -1,10 +1,10 @@
-# Documentación del Proyecto "Bazar de Saray"
+# Documentación del Proyecto "Saray"
 
 Aquí se documentará el progreso general del proyecto, incluyendo implementaciones, decisiones de diseño y cualquier detalle relevante a medida que avancemos en el desarrollo de la app.
 
 ## Resumen del Proyecto
 
-"Bazar de Saray" es una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos de electrodomésticos y otros productos. Está diseñada exclusivamente para Android, integrada con Firebase para autenticación, base de datos y almacenamiento.
+"Saray" es una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos de electrodomésticos y otros productos. Está diseñada exclusivamente para Android, integrada con Firebase para autenticación, base de datos y almacenamiento.
 
 ## Tecnologías Utilizadas
 
@@ -85,6 +85,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - ✅ **Panel de Administración**: Asignación de rol admin, gestión de productos con imágenes.
 - ✅ **Historial de Pedidos**: Navegación, filtros, búsqueda y detalles probados.
 - ✅ **Sistema OTA**: Verificación de actualizaciones, descarga e instalación automática probadas.
+- ✅ **Script Deploy**: `deploy.bat` probado y funcionando correctamente.
 - ✅ **Compilación**: App compila sin errores en Android.
 - ✅ **Manejo de Errores**: Try-catch implementado en componentes críticos.
 - 🔄 **Carrito y Checkout**: Pendiente pruebas exhaustivas finales.
@@ -105,6 +106,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - Lazy loading en listas largas para mejor rendimiento
 - Caching inteligente de imágenes de productos
 - Firebase Analytics para métricas de uso y compras
+- **Mejoras al Sistema OTA**: Notificaciones push para nuevas versiones, changelog automático, rollback de versiones
 
 ### 🟢 FASE 3 - Funcionalidades Avanzadas
 

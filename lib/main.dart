@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UpdateProvider()), // Provider para actualizaciones
       ],
       child: MaterialApp(
-        title: 'Bazar de Saray',
+        title: 'Saray',
         scaffoldMessengerKey:
             EnhancedNotificationService().scaffoldMessengerKey,
         localizationsDelegates: AppLocalizations.localizationsDelegates,

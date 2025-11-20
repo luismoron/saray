@@ -2,7 +2,7 @@
 
 ## 📱 Resumen
 
-La app "Bazar de Saray" cuenta con un sistema completo de notificaciones que incluye notificaciones push mediante Firebase Cloud Messaging (FCM) y un sistema mejorado de notificaciones locales con animaciones y funcionalidades avanzadas.
+La app "Saray" cuenta con un sistema completo de notificaciones que incluye notificaciones push mediante Firebase Cloud Messaging (FCM) y un sistema mejorado de notificaciones locales con animaciones y funcionalidades avanzadas.
 
 ## 🏗️ Arquitectura del Sistema
 

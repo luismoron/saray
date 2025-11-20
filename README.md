@@ -1,4 +1,4 @@
-# Bazar de Saray
+# Saray
 
 Una aplicación de e-commerce desarrollada en Flutter para la venta de repuestos de electrodomésticos y otros productos. Construida con Firebase para autenticación, base de datos y servicios de almacenamiento.
 

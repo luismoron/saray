@@ -1,6 +1,6 @@
-# Lista de Tareas para la App "Bazar de Saray"
+# Lista de Tareas para la App "Saray"
 
-Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y diseñar la app "Bazar de Saray", una aplicación de ventas para repuestos de electrodomésticos y otros productos. Esta lista se basa en las mejores prácticas para una app de e-commerce en Flutter, integrada con Firebase para autenticación, base de datos y otras herramientas. He dividido la lista en fases lógicas para que sea fácil de seguir, priorizando la configuración inicial y el diseño modular.
+Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y diseñar la app "Saray", una aplicación de ventas para repuestos de electrodomésticos y otros productos. Esta lista se basa en las mejores prácticas para una app de e-commerce en Flutter, integrada con Firebase para autenticación, base de datos y otras herramientas. He dividido la lista en fases lógicas para que sea fácil de seguir, priorizando la configuración inicial y el diseño modular.
 
 ## 1. Configuración del Proyecto y Dependencias
 
@@ -86,7 +86,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 
 - [x] **Tema y Estilos**:
   - [x] Usar Material Design para consistencia.
-  - [x] Colores: Elegir paleta relacionada con "Bazar de Saray" (tonos naranjas).
+  - [x] Colores: Elegir paleta relacionada con "Saray" (tonos naranjas).
   - [ ] Iconos: Usar flutter_icons o material icons.
 - [ ] **Navegación**:
   - [x] BottomNavigationBar con tabs: Home, Catálogo, Carrito, Perfil (implementado básico).
@@ -105,7 +105,7 @@ Aquí tienes una lista estructurada de pasos y componentes clave para arrancar y
 
 ## 7. Mejoras y Tareas Adicionales
 
-- [x] **Soporte para Modo Claro y Oscuro**: Implementar temas que respeten la configuración del sistema, con paleta de colores cálida (naranja como seed color) para reflejar el "Bazar de Saray".
+- [x] **Soporte para Modo Claro y Oscuro**: Implementar temas que respeten la configuración del sistema, con paleta de colores cálida (naranja como seed color) para reflejar el "Saray".
 - [ ] **Personalización de Tema**: Agregar opción para que el usuario cambie manualmente entre claro/oscuro.
 - [x] **Internacionalización (i18n)**: Soporte para múltiples idiomas usando intl. Implementado con archivos ARB para inglés y español, detectando automáticamente el idioma del sistema operativo.
 - [ ] **Accesibilidad**: Asegurar que la UI sea accesible (contraste, tamaños de fuente).
