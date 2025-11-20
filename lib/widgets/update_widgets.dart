@@ -26,15 +26,15 @@ class UpdateProvider extends ChangeNotifier {
     }
   }
 
-  /// Descarga el APK y devuelve la ruta del archivo descargado
-  Future<String?> downloadAndInstallUpdate() async {
+  /// Descarga el APK sin instalarlo automáticamente
+  Future<String?> downloadUpdate() async {
     if (_updateInfo == null) return null;
 
     _isDownloading = true;
     notifyListeners();
 
     try {
-      final apkPath = await _updateService.downloadAndInstallUpdate(_updateInfo!);
+      final apkPath = await _updateService.downloadApkOnly(_updateInfo!);
       if (apkPath != null) {
         // Actualizar la información con la ruta del APK descargado
         _updateInfo = UpdateInfo(
@@ -107,12 +107,12 @@ class UpdateNotificationBanner extends StatelessWidget {
                 onPressed: updateProvider.isDownloading
                   ? null
                   : () async {
-                      final apkPath = await updateProvider.downloadAndInstallUpdate();
+                      final apkPath = await updateProvider.downloadUpdate();
                       if (apkPath != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('APK descargado. Instalador abierto automáticamente.'),
-                            duration: Duration(seconds: 3),
+                            content: Text('APK descargado en: $apkPath'),
+                            duration: Duration(seconds: 5),
                           ),
                         );
                       }
@@ -123,7 +123,7 @@ class UpdateNotificationBanner extends StatelessWidget {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Actualizar'),
+                  : const Text('Descargar'),
               ),
             ],
           ),
@@ -196,12 +196,12 @@ class UpdateDialog extends StatelessWidget {
                 ? null
                 : () async {
                     Navigator.of(context).pop();
-                    final apkPath = await updateProvider.downloadAndInstallUpdate();
+                    final apkPath = await updateProvider.downloadUpdate();
                     if (apkPath != null && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('APK descargado. Instalador abierto automáticamente.'),
-                          duration: Duration(seconds: 3),
+                          content: Text('APK descargado. Instálalo manualmente desde tus descargas.'),
+                          duration: Duration(seconds: 5),
                         ),
                       );
                     }
@@ -212,7 +212,7 @@ class UpdateDialog extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Instalar Actualización'),
+                : const Text('Descargar APK'),
             ),
           ],
         );

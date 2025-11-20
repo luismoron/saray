@@ -56,22 +56,25 @@ class UpdateService {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
 
-      debugPrint('Versión actual: $currentVersion');
+      debugPrint('🔍 UpdateService: Versión actual: $currentVersion');
 
       // Obtener información de versión desde Google Drive
+      debugPrint('🔍 UpdateService: Descargando info desde: $_versionInfoUrl');
       final versionInfo = await _getVersionInfo();
 
       if (versionInfo == null) {
-        debugPrint('No se pudo obtener información de versión');
+        debugPrint('❌ UpdateService: No se pudo obtener información de versión');
         return null;
       }
 
       final latestVersion = versionInfo['version']?.toString() ?? '';
 
-      debugPrint('Última versión disponible: $latestVersion');
+      debugPrint('🔍 UpdateService: Última versión disponible: $latestVersion');
+      debugPrint('🔍 UpdateService: Release notes: ${versionInfo['release_notes']}');
 
       // Comparar versiones
       if (_isNewerVersion(latestVersion, currentVersion)) {
+        debugPrint('✅ UpdateService: ¡Nueva versión detectada!');
         return UpdateInfo(
           currentVersion: currentVersion,
           latestVersion: latestVersion,
@@ -83,9 +86,10 @@ class UpdateService {
         );
       }
 
+      debugPrint('ℹ️ UpdateService: La app está actualizada');
       return null;
     } catch (e) {
-      debugPrint('Error al verificar actualización: $e');
+      debugPrint('❌ UpdateService: Error al verificar actualización: $e');
       return null;
     } finally {
       _isCheckingUpdate = false;
@@ -188,6 +192,21 @@ class UpdateService {
   /// Obtiene información de versión desde Google Drive
   Future<Map<String, dynamic>?> _getVersionInfo() async {
     try {
+      // TEMPORAL: Usar archivo local para pruebas
+      debugPrint('🔍 _getVersionInfo: Leyendo archivo local version.json');
+      final file = File('version.json');
+      if (await file.exists()) {
+        final content = await file.readAsString();
+        final data = json.decode(content) as Map<String, dynamic>;
+        debugPrint('✅ _getVersionInfo: Datos obtenidos del archivo local: $data');
+        return data;
+      } else {
+        debugPrint('❌ _getVersionInfo: Archivo version.json no encontrado');
+        return null;
+      }
+
+      /*
+      // Código original para Google Drive
       final response = await _dio.get(_versionInfoUrl);
 
       if (response.statusCode == 200) {
@@ -201,8 +220,9 @@ class UpdateService {
           return json.decode(response.data as String) as Map<String, dynamic>;
         }
       }
+      */
     } catch (e) {
-      debugPrint('Error al obtener información de versión: $e');
+      debugPrint('❌ _getVersionInfo: Error: $e');
     }
     return null;
   }
@@ -231,9 +251,45 @@ class UpdateService {
     }
   }
 
-  /// Verifica si se está verificando una actualización
-  bool get isCheckingUpdate => _isCheckingUpdate;
+  /// Descarga el APK sin instalarlo automáticamente
+  Future<String?> downloadApkOnly(UpdateInfo updateInfo) async {
+    if (_isDownloading) return null;
 
-  /// Verifica si se está descargando una actualización
-  bool get isDownloading => _isDownloading;
+    try {
+      _isDownloading = true;
+
+      // Solicitar permisos necesarios
+      final hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        debugPrint('❌ UpdateService: No se concedieron los permisos necesarios');
+        return null;
+      }
+
+      debugPrint('⬇️ UpdateService: Descargando APK desde: ${updateInfo.apkUrl}');
+
+      // Obtener directorio de descargas
+      final downloadDir = await _getDownloadDirectory();
+      final apkFileName = 'saray-update-${updateInfo.latestVersion}.apk';
+      final apkFile = File('${downloadDir.path}/$apkFileName');
+
+      // Descargar el APK
+      await _dio.download(
+        updateInfo.apkUrl,
+        apkFile.path,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            debugPrint('⬇️ UpdateService: Progreso: ${(received / total * 100).toStringAsFixed(0)}%');
+          }
+        },
+      );
+
+      debugPrint('✅ UpdateService: APK descargado en: ${apkFile.path}');
+      return apkFile.path;
+    } catch (e) {
+      debugPrint('❌ UpdateService: Error al descargar APK: $e');
+      return null;
+    } finally {
+      _isDownloading = false;
+    }
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
-  "release_notes": "• Sistema de actualizaciones automáticas implementado\n• Mejoras en la interfaz de usuario de las tarjetas de productos\n• Corrección de errores menores\n• Optimización del rendimiento",
+  "version": "1.0.2",
+  "release_notes": "Nueva versión con mejoras en el sistema de actualizaciones y correcciones menores",
   "release_date": "2025-11-20"
 }

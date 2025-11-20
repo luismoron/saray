@@ -62,10 +62,13 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
   - Vista detallada de pedidos con productos e imágenes.
   - Solución de problemas de índices de Firestore mediante procesamiento en cliente.
   - Manejo robusto de errores con try-catch y validaciones.
-- **Sistema de Actualizaciones Automáticas (OTA) completamente implementado**:
+- **Sistema de Actualizaciones Automáticas (OTA) completamente integrado**:
+  - Verificación automática de actualizaciones al iniciar la app.
+  - Banner de notificación integrado en pantalla principal.
+  - **Botón de descarga contextual** en AppBar (solo visible cuando hay actualización disponible).
+  - Diálogo detallado con notas de versión.
+  - **Descarga manual del APK** (usuario decide cuándo instalar).
   - Servicio UpdateService con verificación desde Google Drive.
-  - Instalación automática usando intents de Android.
-  - UI completa: UpdateNotificationBanner y UpdateDialog.
   - UpdateProvider para gestión de estado.
   - Script deploy.bat optimizado para distribución a testers.
   - Documentación completa en UPDATE_SETUP.md.
@@ -85,7 +88,7 @@ Aquí se documentará el progreso general del proyecto, incluyendo implementacio
 - ✅ **Autenticación**: Registro, login, logout probados exitosamente.
 - ✅ **Panel de Administración**: Asignación de rol admin, gestión de productos con imágenes.
 - ✅ **Historial de Pedidos**: Navegación, filtros, búsqueda y detalles probados.
-- ✅ **Sistema OTA**: Verificación de actualizaciones, descarga e instalación automática probadas.
+- ✅ **Sistema OTA**: Verificación automática al iniciar app, banner de notificaciones, botón contextual de descarga, descarga manual del APK probadas.
 - ✅ **Script Deploy**: `deploy.bat` probado y funcionando correctamente.
 - ✅ **Cambio de Nombre**: Nombre del proyecto actualizado a "Saray" en toda la aplicación.
 - ✅ **Compilación**: App compila sin errores en Android.
