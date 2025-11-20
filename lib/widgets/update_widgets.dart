@@ -8,10 +8,12 @@ class UpdateProvider extends ChangeNotifier {
   UpdateInfo? _updateInfo;
   bool _isChecking = false;
   bool _isDownloading = false;
+  String? _lastErrorMessage;
 
   UpdateInfo? get updateInfo => _updateInfo;
   bool get isChecking => _isChecking;
   bool get isDownloading => _isDownloading;
+  String? get lastErrorMessage => _lastErrorMessage;
 
   /// Verifica si hay actualizaciones disponibles
   Future<void> checkForUpdates() async {
@@ -52,8 +54,17 @@ class UpdateProvider extends ChangeNotifier {
           releaseDate: _updateInfo!.releaseDate,
           downloadedApkPath: apkPath,
         );
+        return apkPath;
+      } else {
+        // Si apkPath es null, significa que hubo un error
+        debugPrint('❌ UpdateProvider: Error en la descarga/instalación del APK');
+        return null;
       }
-      return apkPath;
+    } catch (e) {
+      debugPrint('❌ UpdateProvider: Excepción durante descarga: $e');
+      // Guardar el mensaje de error para mostrarlo en la UI
+      _lastErrorMessage = e.toString();
+      return null;
     } finally {
       _isDownloading = false;
       notifyListeners();
@@ -120,6 +131,17 @@ class UpdateNotificationBanner extends StatelessWidget {
                           const SnackBar(
                             content: Text('Descargando e instalando actualización...'),
                             duration: Duration(seconds: 3),
+                          ),
+                        );
+                      } else if (context.mounted) {
+                        // Mostrar mensaje de error específico
+                        final errorMessage = updateProvider.lastErrorMessage ??
+                            'Error al descargar la actualización. Verifica conexión y permisos.';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 5),
                           ),
                         );
                       }
@@ -209,6 +231,17 @@ class UpdateDialog extends StatelessWidget {
                         const SnackBar(
                           content: Text('Descargando e instalando actualización...'),
                           duration: Duration(seconds: 3),
+                        ),
+                      );
+                    } else if (context.mounted) {
+                      // Mostrar mensaje de error específico
+                      final errorMessage = updateProvider.lastErrorMessage ??
+                          'Error al descargar la actualización. Verifica conexión y permisos.';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(errorMessage),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 5),
                         ),
                       );
                     }

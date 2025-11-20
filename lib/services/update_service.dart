@@ -102,24 +102,40 @@ class UpdateService {
 
   /// Descarga el APK y devuelve la ruta del archivo descargado
   Future<String?> downloadAndInstallUpdate(UpdateInfo updateInfo) async {
-    if (_isDownloading) return null;
+    if (_isDownloading) {
+      debugPrint('⚠️ Ya hay una descarga en progreso');
+      return null;
+    }
 
     try {
       _isDownloading = true;
+      debugPrint('🚀 Iniciando descarga e instalación de actualización');
+
+      // Verificar conexión a internet
+      try {
+        await _dio.get('https://www.google.com');
+        debugPrint('🌐 Conexión a internet: OK');
+      } catch (e) {
+        debugPrint('❌ Sin conexión a internet: $e');
+        throw Exception('Sin conexión a internet. Verifica tu conexión WiFi/datos.');
+      }
 
       // Solicitar permisos necesarios
       final hasPermission = await _requestPermissions();
       if (!hasPermission) {
-        debugPrint('No se concedieron los permisos necesarios');
-        return null;
+        debugPrint('❌ No se concedieron los permisos necesarios');
+        throw Exception('Permisos denegados. Necesitas conceder permisos de instalación.');
       }
 
-      debugPrint('Descargando APK desde: ${updateInfo.apkUrl}');
+      debugPrint('⬇️ Descargando APK desde: ${updateInfo.apkUrl}');
 
       // Obtener directorio de descargas
       final downloadDir = await _getDownloadDirectory();
       final apkFileName = 'saray-update-${updateInfo.latestVersion}.apk';
       final apkFile = File('${downloadDir.path}/$apkFileName');
+
+      debugPrint('📁 Directorio de descarga: ${downloadDir.path}');
+      debugPrint('📄 Archivo APK: ${apkFile.path}');
 
       // Descargar el APK
       await _dio.download(
@@ -127,12 +143,22 @@ class UpdateService {
         apkFile.path,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            debugPrint('Progreso: ${(received / total * 100).toStringAsFixed(0)}%');
+            final progress = (received / total * 100).toStringAsFixed(0);
+            debugPrint('⬇️ Progreso: $progress% ($received/$total bytes)');
           }
         },
       );
 
-      debugPrint('APK descargado en: ${apkFile.path}');
+      debugPrint('✅ APK descargado exitosamente en: ${apkFile.path}');
+
+      // Verificar que el archivo existe y tiene contenido
+      if (await apkFile.exists()) {
+        final fileSize = await apkFile.length();
+        debugPrint('📊 Tamaño del archivo descargado: $fileSize bytes');
+      } else {
+        debugPrint('❌ El archivo descargado no existe');
+        return null;
+      }
 
       // Crear intent para instalar el APK automáticamente
       try {
@@ -187,20 +213,27 @@ class UpdateService {
   /// Solicita permisos necesarios para la instalación
   Future<bool> _requestPermissions() async {
     try {
+      debugPrint('🔐 Solicitando permisos de instalación...');
+
       // Solicitar permiso de instalación de paquetes
-      final installPermission = await Permission.requestInstallPackages
-          .request();
+      final installPermission = await Permission.requestInstallPackages.request();
+      debugPrint('🔐 Permiso de instalación: ${installPermission.isGranted}');
 
       // Solicitar permiso de almacenamiento (para Android < 13)
       final storagePermission = await Permission.storage.request();
+      debugPrint('🔐 Permiso de almacenamiento: ${storagePermission.isGranted}');
 
       // Para Android 13+ también solicitar permiso de fotos/videos
       final photosPermission = await Permission.photos.request();
+      debugPrint('🔐 Permiso de fotos: ${photosPermission.isGranted}');
 
-      return installPermission.isGranted &&
+      final hasPermissions = installPermission.isGranted &&
           (storagePermission.isGranted || photosPermission.isGranted);
+
+      debugPrint('🔐 Todos los permisos concedidos: $hasPermissions');
+      return hasPermissions;
     } catch (e) {
-      debugPrint('Error al solicitar permisos: $e');
+      debugPrint('❌ Error al solicitar permisos: $e');
       return false;
     }
   }
